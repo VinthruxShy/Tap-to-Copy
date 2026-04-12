@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RoV Ultra Fast Copy</title>
+    <title>RoV Ultra Fast Copy - Vinthrux</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -12,15 +12,13 @@
             background: #111;
             border: 1px solid #222;
             transition: all 0.1s ease;
-            -webkit-tap-highlight-color: transparent; /* ลบสีฟ้าเวลาแตะบนมือถือ */
+            -webkit-tap-highlight-color: transparent;
         }
-        /* เอฟเฟกต์ตอนแตะ */
         .ultra-card:active {
             background: #222;
             border-color: #FE2C55;
             transform: scale(0.98);
         }
-        /* ไฟกะพริบตอนก๊อปปี้สำเร็จ */
         .copied-flash {
             animation: flash 0.4s ease;
         }
@@ -29,23 +27,60 @@
             50% { background-color: #FE2C55; }
             100% { background-color: #111; }
         }
+        
+        /* 💎 สไตล์แถบเมนูแบบเป็นทางการ (Modern Glassmorphism) */
+        .nav-professional {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+        }
+        .nav-item {
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        /* เส้นใต้ปุ่มที่ถูกเลือก */
+        .nav-item-active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 3px;
+            background-color: #FE2C55;
+            border-radius: 2px;
+            box-shadow: 0 0 10px rgba(254, 44, 85, 0.7);
+        }
     </style>
 </head>
-<body class="p-2 flex flex-col items-center min-h-screen">
+<body class="p-2 flex flex-col items-center min-h-screen relative">
 
-    <div class="w-full max-w-md space-y-2">
-        <header class="text-center py-4">
-            <h1 class="text-xl font-bold text-gray-400 tracking-widest uppercase">Tap to Copy</h1>
-            <p class="text-[10px] text-gray-600">แตะที่แถบสีเทาเพื่อก๊อปปี้แท็กทันที</p>
+    <div class="w-full max-w-md space-y-2 mb-24"> <header class="text-center py-6 border-b border-gray-900 mb-4">
+            <h1 class="text-2xl font-bold tracking-tighter text-white">RoV <span class="text-[#FE2C55]">TAG</span> DECK</h1>
+            <p class="text-[11px] text-gray-500 uppercase tracking-widest mt-1">Tap card to copy tags instantly</p>
         </header>
 
-        <div id="listContainer" class="grid grid-cols-1 gap-2 pb-20">
+        <div id="listContainer" class="grid grid-cols-1 gap-2.5">
             </div>
     </div>
 
-    <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white text-black px-8 py-4 rounded-2xl font-bold shadow-2xl transition-all opacity-0 pointer-events-none z-50">
-        COPIED! ✅
+    <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#FE2C55] text-white px-8 py-4 rounded-xl font-bold shadow-2xl transition-all opacity-0 pointer-events-none z-50 text-sm tracking-wide">
+        COPIED TO CLIPBOARD
     </div>
+
+    <nav class="fixed bottom-0 left-0 right-0 nav-professional p-4 flex justify-around items-center z-40 pb-6 rounded-t-3xl">
+        
+        <a href="index.html" class="nav-item nav-item-active flex flex-col items-center gap-1.5 text-[#FE2C55]">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <span class="text-[11px] font-medium uppercase tracking-wider">Tags</span>
+        </a>
+        
+        <a href="calc.html" class="nav-item flex flex-col items-center gap-1.5 text-gray-500 hover:text-white transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h2a2 2 0 002-2zm6-10V7a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2zm0 0v10a2 2 0 002 2h2a2 2 0 002-2v-10a2 2 0 002 2h2a2 2 0 002-2z"></path></svg>
+            <span class="text-[11px] font-medium uppercase tracking-wider">Calculator</span>
+        </a>
+    </nav>
 
     <script>
         const tagList = [
@@ -78,13 +113,13 @@
             tagList.forEach((tag, index) => {
                 const div = document.createElement('div');
                 div.id = `card-${index}`;
-                div.className = "ultra-card w-full p-5 rounded-xl flex items-center gap-4 cursor-pointer select-none";
+                div.className = "ultra-card w-full p-5 rounded-xl flex items-center gap-4 cursor-pointer select-none shadow-lg";
                 div.onclick = () => copyTags(tag, index);
                 div.innerHTML = `
-                    <div class="bg-gray-800 text-gray-400 w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold flex-shrink-0">
-                        ${index + 1}
+                    <div class="bg-gray-900 border border-gray-800 text-gray-500 w-9 h-9 flex items-center justify-center rounded-xl text-xs font-bold flex-shrink-0">
+                        ${String(index + 1).padStart(2, '0')}
                     </div>
-                    <div class="text-sm text-gray-300 font-medium leading-tight">
+                    <div class="text-sm text-gray-300 font-medium leading-relaxed tracking-wide">
                         ${tag}
                     </div>
                 `;
@@ -104,11 +139,11 @@
         function showToast() {
             const toast = document.getElementById('toast');
             toast.style.opacity = "1";
-            toast.style.transform = "translate(-50%, -50%) scale(1.1)";
+            toast.style.transform = "translate(-50%, -50%) scale(1.05)";
             setTimeout(() => {
                 toast.style.opacity = "0";
                 toast.style.transform = "translate(-50%, -50%) scale(1)";
-            }, 600);
+            }, 800);
         }
 
         render();
