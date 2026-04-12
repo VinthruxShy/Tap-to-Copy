@@ -3,220 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROV Creator Mission - Vinthrux</title>
+    <title>RoV AI Planner - Vinthrux</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Chakra Petch', sans-serif; background-color: #000; color: #fff; overflow-x: hidden; }
         .glass-card { background: rgba(17, 17, 17, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 24px; }
-        .mission-item { background: #111; border: 1px solid #222; transition: 0.2s; cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding: 12px; rounded-xl; }
-        .mission-item.active { border-color: #FE2C55; background: rgba(254, 44, 85, 0.1); }
+        .mission-item { background: #111; border: 1px solid #222; transition: 0.2s; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; }
+        .mission-item.active { border-color: #FE2C55; background: rgba(254, 44, 85, 0.15); }
+        .clip-btn { transition: all 0.2s; border: 1px solid #222; font-weight: bold; }
+        .clip-btn.selected { background: #FE2C55; border-color: #FE2C55; color: white; box-shadow: 0 0 10px rgba(254, 44, 85, 0.5); }
+        .target-btn { border: 1px solid #333; transition: 0.3s; background: #0a0a0a; }
+        .target-btn.active { border-color: #FE2C55; color: #FE2C55; background: rgba(254, 44, 85, 0.1); transform: scale(1.05); }
         .nav-professional { background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(15px); border-top: 1px solid rgba(255, 255, 255, 0.1); }
         .nav-item-active::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 20px; height: 3px; background-color: #FE2C55; border-radius: 2px; }
-        input[type="checkbox"] { accent-color: #FE2C55; width: 18px; height: 18px; cursor: pointer; }
-        .clip-btn { transition: all 0.2s; border: 1px solid #222; }
-        .clip-btn.selected { background: #FE2C55; border-color: #FE2C55; color: white; box-shadow: 0 0 10px rgba(254, 44, 85, 0.5); }
+        input[type="checkbox"] { accent-color: #FE2C55; width: 16px; height: 16px; }
+        .ai-badge { background: linear-gradient(90deg, #FE2C55, #25F4EE); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: bold; }
     </style>
 </head>
 <body class="p-4 flex flex-col items-center min-h-screen">
 
     <div class="w-full max-w-md space-y-4 mb-28">
         <header class="text-center py-6 border-b border-gray-900">
-            <h1 class="text-2xl font-bold tracking-tighter text-white uppercase">ROV <span class="text-[#FE2C55]">Missions</span></h1>
-            <p class="text-[11px] text-gray-500 uppercase tracking-widest mt-1">Dashboard จำลองกิจกรรมครีเอเตอร์</p>
+            <h1 class="text-2xl font-bold tracking-tighter uppercase italic">RoV <span class="ai-badge">AI PLANNER</span></h1>
+            <p class="text-[10px] text-gray-500 uppercase tracking-[0.2em] mt-1">Vinthrux Automation System</p>
         </header>
 
-        <div class="glass-card p-6 shadow-2xl sticky top-2 z-30 border-[#FE2C55]/30 border">
-            <div class="text-center">
-                <p class="text-[10px] text-gray-500 uppercase tracking-widest">แต้มรวมที่ทำได้</p>
-                <h2 id="totalPoints" class="text-6xl font-bold text-white my-1">0</h2>
-                <p class="text-[#FE2C55] text-[10px] font-bold uppercase tracking-widest">Points Accumulated</p>
+        <div class="glass-card p-5 border-white/5 border">
+            <h3 class="text-[10px] text-gray-400 uppercase font-bold mb-4 tracking-widest text-center">เลือกเป้าหมายคูปอง</h3>
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="aiPlan(360, this)" class="target-btn p-3 rounded-xl text-xs font-bold uppercase">600 ปอง</button>
+                <button onclick="aiPlan(480, this)" class="target-btn p-3 rounded-xl text-xs font-bold uppercase">800 ปอง</button>
+                <button onclick="aiPlan(540, this)" class="target-btn p-3 rounded-xl text-xs font-bold uppercase">900 ปอง</button>
+                <button onclick="aiPlan(600, this)" class="target-btn p-3 rounded-xl text-xs font-bold uppercase">1000 ปอง</button>
+                <button onclick="aiPlan(780, this)" class="target-btn p-3 rounded-xl text-xs font-bold uppercase">1300 ปอง</button>
+                <button onclick="resetAll()" class="p-3 rounded-xl text-[10px] bg-red-950/30 text-red-500 font-bold uppercase border border-red-900/30">Reset</button>
             </div>
-            
-            <div class="mt-6 pt-4 border-t border-gray-800">
-                <p class="text-[10px] text-gray-500 uppercase mb-3 font-bold">🎯 ของรางวัลที่แลกได้</p>
-                <div id="rewardStatus" class="space-y-2">
-                    </div>
+        </div>
+
+        <div class="glass-card p-6 shadow-2xl sticky top-2 z-30 border-[#FE2C55]/30 border shadow-[0_0_20px_rgba(254,44,85,0.1)]">
+            <div class="text-center">
+                <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">แต้มสะสมปัจจุบัน</p>
+                <h2 id="totalPoints" class="text-6xl font-bold text-white tracking-tighter">0</h2>
+                <div id="aiAdvice" class="mt-3 p-2 rounded-lg bg-white/5 text-[11px] text-[#25F4EE] font-medium min-h-[20px]">
+                    ระบบพร้อมช่วยวางแผนแล้ว...
+                </div>
             </div>
         </div>
 
         <div class="glass-card p-5">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xs font-bold text-white uppercase tracking-wider">🎬 รายการคลิป (25 แต้ม/คลิป)</h3>
-                <span id="clipCounter" class="text-[10px] text-sky-400 font-bold">0/22</span>
+                <h3 class="text-xs font-bold text-white uppercase tracking-wider">🎬 รายการคลิป (25 แต้ม/ชุด)</h3>
+                <span id="clipInfo" class="text-[10px] text-gray-500 uppercase">0/22 Clips</span>
             </div>
-            <div class="grid grid-cols-5 gap-2" id="clipGrid">
-                </div>
+            <div class="grid grid-cols-5 gap-2" id="clipGrid"></div>
         </div>
 
         <div class="glass-card p-5">
-            <h3 class="text-xs font-bold text-white mb-4 uppercase tracking-wider">📅 Monthly Missions</h3>
-            <div class="space-y-2">
-                <div class="mission-item rounded-xl" onclick="toggleCheckbox(this)">
-                    <span class="text-xs">ครบ 500 วิว (+20)</span>
-                    <input type="checkbox" class="m-check" data-pts="20">
+            <h3 class="text-xs font-bold text-white mb-4 uppercase tracking-wider">🎯 ภารกิจที่ต้องทำ</h3>
+            <div class="space-y-2" id="missionList">
                 </div>
-                <div class="mission-item rounded-xl" onclick="toggleCheckbox(this)">
-                    <span class="text-xs">ครบ 5,000 วิว (+20)</span>
-                    <input type="checkbox" class="m-check" data-pts="20">
-                </div>
-                <div class="mission-item rounded-xl" onclick="toggleCheckbox(this)">
-                    <span class="text-xs">ครบ 30,000 วิว (+20)</span>
-                    <input type="checkbox" class="m-check" data-pts="20">
-                </div>
-                <div class="mission-item rounded-xl border-sky-900" onclick="toggleCheckbox(this)">
-                    <span class="text-xs text-sky-400">สำเร็จครบ 30 ภารกิจ (+60)</span>
-                    <input type="checkbox" class="m-check" data-pts="60">
-                </div>
-            </div>
-        </div>
-
-        <div class="glass-card p-5">
-            <h3 class="text-xs font-bold text-[#FE2C55] mb-4 uppercase tracking-wider text-center">🕒 Update 12H & VIP</h3>
-            <div class="space-y-2">
-                <div class="mission-item rounded-xl" onclick="toggleCheckbox(this)">
-                    <span class="text-xs">100 ไลค์ (+15)</span>
-                    <input type="checkbox" class="m-check" data-pts="15">
-                </div>
-                <div class="mission-item rounded-xl" onclick="toggleCheckbox(this)">
-                    <span class="text-xs">10,000 วิวต่อคลิป (+20)</span>
-                    <input type="checkbox" class="m-check" data-pts="20">
-                </div>
-                
-                <div class="grid grid-cols-2 gap-2">
-                    <div class="mission-item rounded-xl !p-2" onclick="toggleCheckbox(this)">
-                        <span class="text-[10px]">2 คลิป (+10)</span>
-                        <input type="checkbox" class="m-check" data-pts="10">
-                    </div>
-                    <div class="mission-item rounded-xl !p-2" onclick="toggleCheckbox(this)">
-                        <span class="text-[10px]">5 คลิป (+10)</span>
-                        <input type="checkbox" class="m-check" data-pts="10">
-                    </div>
-                    <div class="mission-item rounded-xl !p-2" onclick="toggleCheckbox(this)">
-                        <span class="text-[10px]">10 คลิป (+10)</span>
-                        <input type="checkbox" class="m-check" data-pts="10">
-                    </div>
-                    <div class="mission-item rounded-xl !p-2" onclick="toggleCheckbox(this)">
-                        <span class="text-[10px]">15 คลิป (+10)</span>
-                        <input type="checkbox" class="m-check" data-pts="10">
-                    </div>
-                </div>
-
-                <div class="bg-gray-900/50 p-3 rounded-2xl border border-yellow-600/20 mt-2 space-y-2">
-                    <p class="text-[10px] text-yellow-500 font-bold mb-1">⭐ ภารกิจ VIP</p>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div class="mission-item rounded-lg !p-2 !bg-black" onclick="toggleCheckbox(this)">
-                            <span class="text-[9px]">1 VIP (+10)</span>
-                            <input type="checkbox" class="m-check" data-pts="10">
-                        </div>
-                        <div class="mission-item rounded-lg !p-2 !bg-black" onclick="toggleCheckbox(this)">
-                            <span class="text-[9px]">3 VIP (+10)</span>
-                            <input type="checkbox" class="m-check" data-pts="10">
-                        </div>
-                        <div class="mission-item rounded-lg !p-2 !bg-black" onclick="toggleCheckbox(this)">
-                            <span class="text-[9px]">7 VIP (+10)</span>
-                            <input type="checkbox" class="m-check" data-pts="10">
-                        </div>
-                        <div class="mission-item rounded-lg !p-2 !bg-black" onclick="toggleCheckbox(this)">
-                            <span class="text-[9px]">12 VIP (+10)</span>
-                            <input type="checkbox" class="m-check" data-pts="10">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mission-item rounded-xl" onclick="toggleCheckbox(this)">
-                    <span class="text-xs font-bold text-sky-400 italic">ผูกบัญชี TikTok (+10)</span>
-                    <input type="checkbox" class="m-check" data-pts="10">
-                </div>
-                <div class="mission-item rounded-xl" onclick="toggleCheckbox(this)">
-                    <span class="text-xs font-bold text-sky-400 italic">ลงวิดีโอครั้งแรก (+10)</span>
-                    <input type="checkbox" class="m-check" data-pts="10">
-                </div>
-            </div>
         </div>
     </div>
 
-    <nav class="fixed bottom-0 left-0 right-0 nav-professional p-4 flex justify-around items-center z-40 pb-6 rounded-t-3xl">
-        <a href="index.html" class="flex flex-col items-center gap-1.5 text-gray-500">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            <span class="text-[11px] font-medium uppercase tracking-wider">Tags</span>
-        </a>
-        <a href="mission.html" class="nav-item nav-item-active relative flex flex-col items-center gap-1.5 text-[#FE2C55]">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12z"></path></svg>
-            <span class="text-[11px] font-medium uppercase tracking-wider">Mission</span>
-        </a>
-        <a href="calc.html" class="flex flex-col items-center gap-1.5 text-gray-500">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h2a2 2 0 002-2zm6-10V7a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2zm0 0v10a2 2 0 002 2h2a2 2 0 002-2v-10a2 2 0 002 2h2a2 2 0 002-2z"></path></svg>
-            <span class="text-[11px] font-medium uppercase tracking-wider">Calc</span>
-        </a>
+    <nav class="fixed bottom-0 left-0 right-0 nav-professional p-4 flex justify-around items-center z-40 pb-6 rounded-t-3xl shadow-2xl">
+        <a href="index.html" class="flex flex-col items-center gap-1.5 text-gray-500 hover:text-white transition-all"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><span class="text-[11px] font-medium uppercase">Tags</span></a>
+        <a href="mission.html" class="nav-item nav-item-active relative flex flex-col items-center gap-1.5 text-[#FE2C55]"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12z"></path></svg><span class="text-[11px] font-medium uppercase">Mission</span></a>
+        <a href="calc.html" class="flex flex-col items-center gap-1.5 text-gray-500 hover:text-white transition-all"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h2a2 2 0 002-2zm6-10V7a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2zm0 0v10a2 2 0 002 2h2a2 2 0 002-2v-10a2 2 0 002 2h2a2 2 0 002-2z"></path></svg><span class="text-[11px] font-medium uppercase">Calc</span></a>
     </nav>
 
     <script>
-        let selectedClipsCount = 0;
+        const clipsData = [6,6,8,8,8,8,8,10,10,10,8,8,8,10,10,10,10,12,12,12,12,10]; // วิวคลิป 1-22 (หน่วย k)
+        const missions = [
+            { id: 'm1', name: '500 วิว', pts: 20 },
+            { id: 'm2', name: '5,000 วิว', pts: 20 },
+            { id: 'm3', name: '30k วิว', pts: 20 },
+            { id: 'm30', name: 'ครบ 30 ภารกิจ', pts: 60 },
+            { id: 'l100', name: '100 ไลค์', pts: 15 },
+            { id: 'v10k', name: '10,000 วิว/คลิป', pts: 20 },
+            { id: 'c2', name: 'ลง 2 คลิป', pts: 10 },
+            { id: 'c5', name: 'ลง 5 คลิป', pts: 10 },
+            { id: 'c10', name: 'ลง 10 คลิป', pts: 10 },
+            { id: 'c15', name: 'ลง 15 คลิป', pts: 10 },
+            { id: 'vip1', name: 'VIP 1 สำเร็จ', pts: 10 },
+            { id: 'vip3', name: 'VIP 3 สำเร็จ', pts: 10 },
+            { id: 'vip7', name: 'VIP 7 สำเร็จ', pts: 10 },
+            { id: 'vip12', name: 'VIP 12 สำเร็จ', pts: 10 },
+            { id: 'tiktok', name: 'ผูกบัญชี TikTok', pts: 10 },
+            { id: 'first', name: 'ลงวิดีโอครั้งแรก', pts: 10 }
+        ];
 
-        // สร้างปุ่มคลิป 1-22
-        function createClipGrid() {
+        let selectedClips = new Set();
+        let selectedMissions = new Set();
+
+        function createUI() {
             const grid = document.getElementById('clipGrid');
-            for(let i=1; i<=22; i++) {
+            grid.innerHTML = '';
+            clipsData.forEach((v, i) => {
                 const btn = document.createElement('div');
-                btn.className = "clip-btn h-10 flex items-center justify-center rounded-xl bg-black text-[10px] cursor-pointer";
-                btn.innerText = i;
-                btn.onclick = function() {
-                    this.classList.toggle('selected');
-                    this.classList.contains('selected') ? selectedClipsCount++ : selectedClipsCount--;
-                    document.getElementById('clipCounter').innerText = `${selectedClipsCount}/22`;
-                    calculatePoints();
-                };
+                btn.className = `clip-btn h-12 flex flex-col items-center justify-center rounded-xl text-[10px] cursor-pointer ${selectedClips.has(i) ? 'selected' : 'bg-black text-gray-500'}`;
+                btn.innerHTML = `<span>${i+1}</span><span class="opacity-60">${v}k</span>`;
+                btn.onclick = () => { toggleClip(i); manualMode(); };
                 grid.appendChild(btn);
-            }
-        }
-
-        // ฟังการคลิกที่กล่องภารกิจ
-        function toggleCheckbox(el) {
-            const cb = el.querySelector('input');
-            cb.checked = !cb.checked;
-            el.classList.toggle('active', cb.checked);
-            calculatePoints();
-        }
-
-        function calculatePoints() {
-            let pts = selectedClipsCount * 25;
-            
-            const checks = document.querySelectorAll('.m-check');
-            checks.forEach(c => {
-                if(c.checked) pts += parseInt(c.dataset.pts);
             });
 
-            document.getElementById('totalPoints').innerText = pts;
-            updateRewards(pts);
-        }
-
-        function updateRewards(pts) {
-            const rewards = [
-                { name: "500 ปอง", cost: 300, limit: 2 },
-                { name: "300 ปอง", cost: 180, limit: 3 },
-                { name: "100 ปอง", cost: 70, limit: 4 }
-            ];
-
-            const container = document.getElementById('rewardStatus');
-            container.innerHTML = '';
-
-            rewards.forEach(r => {
-                let canExchange = Math.floor(pts / r.cost);
-                if(canExchange > r.limit) canExchange = r.limit;
-
+            const mList = document.getElementById('missionList');
+            mList.innerHTML = '';
+            missions.forEach(m => {
                 const div = document.createElement('div');
-                div.className = `flex justify-between items-center p-3 rounded-xl border ${canExchange > 0 ? 'border-green-500/30 bg-green-500/5 text-green-400' : 'border-gray-800 text-gray-500'}`;
-                div.innerHTML = `
-                    <span class="text-xs font-bold">${r.name}</span>
-                    <span class="text-[10px]">แลกได้ ${canExchange} / ${r.limit} ครั้ง</span>
-                `;
-                container.appendChild(div);
+                div.className = `mission-item ${selectedMissions.has(m.id) ? 'active' : ''}`;
+                div.innerHTML = `<span class="text-xs font-bold">${m.name} (+${m.pts})</span><input type="checkbox" ${selectedMissions.has(m.id) ? 'checked' : ''} onchange="toggleMission('${m.id}')">`;
+                div.onclick = (e) => { if(e.target.type !== 'checkbox') toggleMission(m.id); manualMode(); };
+                mList.appendChild(div);
             });
+            updatePoints();
         }
 
-        createClipGrid();
-        calculatePoints();
+        function toggleClip(i) {
+            selectedClips.has(i) ? selectedClips.delete(i) : selectedClips.add(i);
+            createUI();
+        }
+
+        function toggleMission(id) {
+            selectedMissions.has(id) ? selectedMissions.delete(id) : selectedMissions.add(id);
+            createUI();
+        }
+
+        function updatePoints() {
+            let pts = selectedClips.size * 25;
+            missions.forEach(m => { if(selectedMissions.has(m.id)) pts += m.pts; });
+            document.getElementById('totalPoints').innerText = pts;
+            document.getElementById('clipInfo').innerText = `${selectedClips.size}/22 Clips`;
+        }
+
+        function aiPlan(targetPts, btn) {
+            resetAll();
+            document.querySelectorAll('.target-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            let currentPts = 0;
+            const advice = document.getElementById('aiAdvice');
+
+            // 1. เลือกภารกิจพื้นฐาน (แต้มได้ชัวร์ๆ)
+            const baseMissions = ['tiktok', 'first', 'm1', 'm2', 'l100', 'vip1'];
+            baseMissions.forEach(id => { 
+                selectedMissions.add(id); 
+                currentPts += missions.find(m => m.id === id).pts; 
+            });
+
+            // 2. คำนวณจำนวนคลิปที่ต้องลงเพื่อให้แต้มถึงเป้า
+            // สมมติลงคลิป 1-N ไปเรื่อยๆ
+            for(let i=0; i<22; i++) {
+                if(currentPts >= targetPts) break;
+                selectedClips.add(i);
+                currentPts += 25; // แต้มลงคลิป
+
+                // ตรวจสอบเงื่อนไขยอดวิวสะสม/จำนวนคลิป
+                let totalV = Array.from(selectedClips).reduce((s, idx) => s + clipsData[idx], 0);
+                if(totalV >= 30 && !selectedMissions.has('m3')) { selectedMissions.add('m3'); currentPts += 20; }
+                if(selectedClips.size >= 2 && !selectedMissions.has('c2')) { selectedMissions.add('c2'); currentPts += 10; }
+                if(selectedClips.size >= 5 && !selectedMissions.has('c5')) { selectedMissions.add('c5'); currentPts += 10; }
+                if(selectedClips.size >= 10 && !selectedMissions.has('c10')) { selectedMissions.add('c10'); currentPts += 10; }
+                if(selectedClips.size >= 15 && !selectedMissions.has('c15')) { selectedMissions.add('c15'); currentPts += 10; }
+                if(clipsData[i] >= 10 && !selectedMissions.has('v10k')) { selectedMissions.add('v10k'); currentPts += 20; }
+            }
+
+            advice.innerHTML = `AI แนะนำ: ลง <span class="text-white font-bold">${selectedClips.size} คลิป</span> และทำภารกิจที่ติ๊กไว้ จะได้แต้มครบพอดี`;
+            createUI();
+        }
+
+        function resetAll() {
+            selectedClips.clear();
+            selectedMissions.clear();
+            document.getElementById('aiAdvice').innerText = "ระบบพร้อมช่วยวางแผนแล้ว...";
+            document.querySelectorAll('.target-btn').forEach(b => b.classList.remove('active'));
+            createUI();
+        }
+
+        function manualMode() {
+            document.getElementById('aiAdvice').innerText = "โหมดปรับแต่งเอง (Manual Mode)";
+            document.querySelectorAll('.target-btn').forEach(b => b.classList.remove('active'));
+        }
+
+        createUI();
     </script>
 </body>
 </html>
