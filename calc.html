@@ -3,78 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RoV Calc - Vinthrux</title>
+    <title>RoV Calc Pro - Vinthrux</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Chakra Petch', sans-serif; background-color: #000; color: #fff; overflow-x: hidden; }
-        .nav-professional { background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(15px); border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        .glass-card { background: rgba(17, 17, 17, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 24px; }
+        .active-chip { background: linear-gradient(45deg, #FE2C55, #ff5e7d) !important; color: #fff !important; border-color: transparent !important; }
+        .nav-professional { background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(15px); border-top: 1px solid rgba(255, 255, 255, 0.05); }
         .nav-item-active::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 20px; height: 3px; background-color: #FE2C55; border-radius: 2px; }
-        .glass-card { background: #111; border: 1px solid #222; border-radius: 24px; }
+        #clipList::-webkit-scrollbar { width: 4px; }
+        #clipList::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
         input:focus { border-color: #FE2C55 !important; outline: none; }
     </style>
 </head>
 <body class="p-4 flex flex-col items-center min-h-screen">
 
-    <div class="w-full max-w-md space-y-4 mb-24">
-        <header class="text-center py-6 border-b border-gray-900 mb-4">
+    <div class="w-full max-w-md space-y-4 mb-28">
+        <header class="text-center py-6 border-b border-gray-900 mb-2">
             <h1 class="text-2xl font-bold tracking-tighter text-white uppercase">Pro <span class="text-[#FE2C55]">Calculator</span></h1>
-            <p class="text-[11px] text-gray-500 uppercase tracking-widest mt-1">Calculate earnings instantly</p>
+            <p class="text-[11px] text-gray-500 uppercase tracking-widest mt-1">Select Clips & Calculate Earnings</p>
         </header>
 
-        <div class="glass-card p-6 shadow-2xl">
-            <div class="space-y-4">
-                <div>
-                    <label class="text-[10px] text-gray-500 uppercase tracking-widest ml-1">เรทราคา (ต่อ 1,000 วิว)</label>
-                    <input type="number" id="rate" step="0.001" oninput="doCalc()" placeholder="0.015" class="w-full bg-black border border-gray-800 p-4 rounded-xl mt-1 text-xl font-bold text-white transition-all">
-                </div>
-                <div class="flex gap-3">
-                    <div class="w-1/2">
-                        <label class="text-[10px] text-gray-500 uppercase tracking-widest ml-1">ยอดวิว/คลิป</label>
-                        <input type="number" id="views" oninput="doCalc()" placeholder="12000" class="w-full bg-black border border-gray-800 p-4 rounded-xl mt-1 font-bold text-white transition-all">
-                    </div>
-                    <div class="w-1/2">
-                        <label class="text-[10px] text-gray-500 uppercase tracking-widest ml-1">จำนวนคลิป</label>
-                        <input type="number" id="clips" oninput="doCalc()" placeholder="6" class="w-full bg-black border border-gray-800 p-4 rounded-xl mt-1 font-bold text-white transition-all">
-                    </div>
-                </div>
+        <div class="glass-card p-6 shadow-2xl sticky top-2 z-30">
+            <div class="flex justify-between items-end mb-2">
+                <label class="text-[10px] text-gray-500 uppercase tracking-widest ml-1">เรทราคา / 1,000 วิว</label>
+                <div id="selectedCount" class="text-[10px] text-[#FE2C55] font-bold uppercase">SELECTED: 0 CLIPS</div>
+            </div>
+            <input type="number" id="currentRate" step="0.001" oninput="calculate()" placeholder="0.015"
+                class="w-full bg-black border border-gray-800 p-4 rounded-xl text-xl font-bold text-white transition-all mb-4">
+
+            <div class="py-6 bg-black/50 rounded-2xl border border-gray-800 text-center">
+                <div class="text-[10px] text-gray-500 uppercase mb-1">ยอดวิวรวม: <span id="totalViewsDisplay" class="text-white font-bold">0</span></div>
+                <div class="text-4xl font-bold text-white" id="totalPrice">0.00</div>
+                <div class="text-[#FE2C55] text-xs font-bold uppercase">Thai Baht</div>
             </div>
 
-            <div class="mt-8 py-8 bg-black/50 rounded-3xl border border-[#FE2C55]/20 text-center relative">
-                <div class="text-[10px] text-gray-500 uppercase mb-1">ยอดสุทธิที่ต้องจัดเก็บ</div>
-                <div class="text-5xl font-bold text-white" id="result">0.00</div>
-                <div class="text-[#FE2C55] font-bold text-xs mt-1 uppercase">Thai Baht</div>
-            </div>
-
-            <button onclick="copySummary()" class="w-full mt-6 py-4 bg-white text-black font-bold rounded-xl active:scale-95 transition-all text-sm uppercase tracking-widest">📋 Copy Summary</button>
+            <button onclick="copySummary()" id="copyBtn" class="w-full mt-4 py-4 bg-[#FE2C55] text-white font-bold rounded-xl hidden active:scale-95 transition-all text-sm uppercase tracking-widest">
+                📋 Copy Summary
+            </button>
         </div>
+
+        <div class="glass-card p-5">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-[11px] text-gray-500 uppercase tracking-widest font-bold">🎬 เลือกคลิปที่ทำ</h3>
+                <button onclick="clearSelection()" class="text-[10px] text-red-500 font-bold uppercase">Clear All</button>
+            </div>
+            <div id="clipList" class="space-y-2 max-h-72 overflow-y-auto pr-2">
+                </div>
+        </div>
+
+        <div class="glass-card p-5">
+            <h3 class="text-[11px] text-gray-500 uppercase tracking-widest font-bold mb-4 text-center">Save Template</h3>
+            <div class="flex gap-2">
+                <input type="text" id="tempName" placeholder="ชื่อเทมเพลต..." 
+                    class="flex-grow bg-black border border-gray-800 p-3 rounded-xl text-sm outline-none">
+                <button onclick="saveAsTemplate()" class="bg-white text-black px-5 rounded-xl font-bold text-xs uppercase">Save</button>
+            </div>
+        </div>
+
+        <div id="templateContainer" class="space-y-2">
+            </div>
     </div>
 
     <nav class="fixed bottom-0 left-0 right-0 nav-professional p-4 flex justify-around items-center z-40 pb-6 rounded-t-3xl">
-        <a href="index.html" class="nav-item flex flex-col items-center gap-1.5 text-gray-500 hover:text-white">
+        <a href="index.html" class="nav-item flex flex-col items-center gap-1.5 text-gray-500 hover:text-white transition-colors">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            <span class="text-[11px] font-medium uppercase tracking-wider">Tags</span>
+            <span class="text-[11px] font-medium uppercase tracking-wider text-nowrap">Tags</span>
         </a>
         <a href="calc.html" class="nav-item nav-item-active relative flex flex-col items-center gap-1.5 text-[#FE2C55]">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h2a2 2 0 002-2zm6-10V7a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2zm0 0v10a2 2 0 002 2h2a2 2 0 002-2v-10a2 2 0 002 2h2a2 2 0 002-2z"></path></svg>
-            <span class="text-[11px] font-medium uppercase tracking-wider">Calculator</span>
+            <span class="text-[11px] font-medium uppercase tracking-wider text-nowrap">Calculator</span>
         </a>
     </nav>
 
     <script>
-        function doCalc() {
-            const r = parseFloat(document.getElementById('rate').value) || 0;
-            const v = parseFloat(document.getElementById('views').value) || 0;
-            const c = parseFloat(document.getElementById('clips').value) || 0;
-            const total = (v / 1000) * c * r;
-            document.getElementById('result').innerText = total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        const rovClips = [
+            { id: 1, tags: "#RoV #RoVเป็นเกมตลก #คลิปRoV", v: 6000 },
+            { id: 2, tags: "#RoV #คลิปRoV #rovth", v: 6000 },
+            { id: 3, tags: "#RoV #ควิกแชทนี้พี่จัดให้ #หยุดโลกด้วยเสียง #GildurPASULOL", v: 8000 },
+            { id: 4, tags: "#RoV #Flowborn #ฮีโร่ใหม่RoV #FlowbornPreheat", v: 8000 },
+            { id: 5, tags: "#RoV #RoVเป็นเกมตลก #rovth", v: 8000 },
+            { id: 6, tags: "#RoV #RoVเป็นเกมตลก #fpy", v: 8000 },
+            { id: 7, tags: "#RoV #RoVเป็นเกมตลก #trending", v: 8000 },
+            { id: 8, tags: "#RoV #RoVเป็นเกมตลก #เล่นRoV", v: 10000 },
+            { id: 9, tags: "#RoV #RoVเป็นเกมตลก #RoVเกมภาพสวย", v: 10000 },
+            { id: 10, tags: "#RoV #rovth #RoVThailand", v: 10000 },
+            { id: 11, tags: "#RoV #ควิกแชทนี้พี่จัดให้ #TeamKongInRoV", v: 8000 },
+            { id: 12, tags: "#RoV #RoVเรียกเพื่อนกลับบ้าน #CallbackRoV", v: 8000 },
+            { id: 13, tags: "#RoV #RoVเป็นเกมตลก #บัฟปรับใหม่ฮีโร่RoV", v: 8000 },
+            { id: 14, tags: "#RoV #DesperateFight #RoVอัปเดตแพทช์ใหม่", v: 10000 },
+            { id: 15, tags: "#RoV #FlowbornGuide #ฮีโร่ใหม่RoV #RoVFlowborn", v: 10000 },
+            { id: 16, tags: "#RoV #ROVThailand #สกินMythicalเล่นฟรี", v: 10000 },
+            { id: 17, tags: "#RoV #ROVThailand #RoVเปิดหมดทุกโหมด", v: 10000 },
+            { id: 18, tags: "#RoV #rovth #fpy", v: 12000 },
+            { id: 19, tags: "#RoV #rovth #trending", v: 12000 },
+            { id: 20, tags: "#RoV #rovth #เล่นRoV", v: 12000 },
+            { id: 21, tags: "#RoV #rovth #RoVเกมภาพสวย", v: 12000 },
+            { id: 22, tags: "#RoV #rovth #คลิปRoV", v: 10000 }
+        ];
+
+        let selectedClipIds = [];
+        let savedTemplates = JSON.parse(localStorage.getItem('rov_pump_templates')) || [];
+
+        function renderClips() {
+            const list = document.getElementById('clipList');
+            list.innerHTML = '';
+            rovClips.forEach(clip => {
+                const isActive = selectedClipIds.includes(clip.id);
+                const div = document.createElement('div');
+                div.className = `p-4 rounded-2xl border border-gray-900 cursor-pointer transition-all ${isActive ? 'active-chip' : 'bg-black/40 text-gray-300 hover:border-gray-700'}`;
+                div.onclick = () => toggleClip(clip.id);
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div class="text-[12px] font-medium leading-relaxed mr-4">${clip.tags}</div>
+                        <div class="font-bold text-xs">${(clip.v/1000)}k</div>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
         }
+
+        function toggleClip(id) {
+            selectedClipIds = selectedClipIds.includes(id) ? selectedClipIds.filter(i => i !== id) : [...selectedClipIds, id];
+            updateUI();
+        }
+
+        function clearSelection() {
+            selectedClipIds = [];
+            updateUI();
+        }
+
+        function updateUI() {
+            renderClips();
+            const totalViews = selectedClipIds.reduce((sum, id) => sum + rovClips.find(c => c.id === id).v, 0);
+            document.getElementById('totalViewsDisplay').innerText = totalViews.toLocaleString();
+            document.getElementById('selectedCount').innerText = `SELECTED: ${selectedClipIds.length} CLIPS`;
+            document.getElementById('copyBtn').classList.toggle('hidden', selectedClipIds.length === 0);
+            calculate();
+            renderTemplates();
+        }
+
+        function calculate() {
+            const rate = parseFloat(document.getElementById('currentRate').value) || 0;
+            const totalViews = selectedClipIds.reduce((sum, id) => sum + rovClips.find(c => c.id === id).v, 0);
+            const total = (totalViews / 1000) * rate;
+            document.getElementById('totalPrice').innerText = total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        function saveAsTemplate() {
+            const name = document.getElementById('tempName').value;
+            if(!name || selectedClipIds.length === 0) return;
+            savedTemplates.push({ id: Date.now(), name, clipIds: [...selectedClipIds] });
+            localStorage.setItem('rov_pump_templates', JSON.stringify(savedTemplates));
+            document.getElementById('tempName').value = '';
+            renderTemplates();
+        }
+
+        function renderTemplates() {
+            const container = document.getElementById('templateContainer');
+            container.innerHTML = '<h3 class="text-[10px] text-gray-500 uppercase font-bold mb-3 ml-1">Templates</h3>';
+            savedTemplates.forEach(t => {
+                const totalV = t.clipIds.reduce((sum, id) => sum + (rovClips.find(c => c.id === id)?.v || 0), 0);
+                const div = document.createElement('div');
+                div.className = "glass-card p-4 flex justify-between items-center mb-2 border border-gray-900";
+                div.innerHTML = `
+                    <div onclick="loadTemplate(${t.id})" class="flex-grow cursor-pointer">
+                        <div class="font-bold text-sm text-white">${t.name}</div>
+                        <div class="text-[10px] text-[#FE2C55] font-bold uppercase">${t.clipIds.length} Clips | ${totalV.toLocaleString()} Views</div>
+                    </div>
+                    <button onclick="deleteTemplate(${t.id})" class="text-gray-600 hover:text-red-500 p-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function loadTemplate(id) {
+            selectedClipIds = [...savedTemplates.find(temp => temp.id === id).clipIds];
+            updateUI();
+        }
+
+        function deleteTemplate(id) {
+            savedTemplates = savedTemplates.filter(t => t.id !== id);
+            localStorage.setItem('rov_pump_templates', JSON.stringify(savedTemplates));
+            renderTemplates();
+        }
+
         function copySummary() {
-            const total = document.getElementById('result').innerText;
-            if(total == "0.00") return;
-            const text = `📊 สรุปยอดงานปั๊มวิว\n━━━━━━━━━━━━━━\n💰 ยอดสุทธิ: ${total} บาท\n━━━━━━━━━━━━━━`;
-            navigator.clipboard.writeText(text).then(() => alert("ก๊อปปี้สรุปยอดแล้ว!"));
+            const rate = document.getElementById('currentRate').value;
+            const total = document.getElementById('totalPrice').innerText;
+            const totalViews = selectedClipIds.reduce((sum, id) => sum + rovClips.find(c => c.id === id).v, 0);
+            let details = selectedClipIds.map((id, index) => {
+                const clip = rovClips.find(c => c.id === id);
+                return `${index + 1}. ${clip.tags} (${clip.v/1000}k)`;
+            }).join('\n');
+            const text = `📊 สรุปงานปั๊มวิว RoV\n━━━━━━━━━━━━━━\n${details}\n━━━━━━━━━━━━━━\n🎬 ทั้งหมด: ${selectedClipIds.length} คลิป\n📈 ยอดวิวรวม: ${totalViews.toLocaleString()} วิว\n💵 เรทวันนี้: ${rate}\n💰 รวมสุทธิ: ${total} บาท\n━━━━━━━━━━━━━━`;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('copyBtn');
+                btn.innerText = "COPIED ✅";
+                setTimeout(() => btn.innerText = "📋 Copy Summary", 2000);
+            });
         }
+
+        renderClips();
+        renderTemplates();
     </script>
 </body>
 </html>
