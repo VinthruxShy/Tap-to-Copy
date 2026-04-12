@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoV Ultra Fast Copy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Chakra Petch', sans-serif; background-color: #000; color: #fff; overflow-x: hidden; }
+        .ultra-card {
+            background: #111;
+            border: 1px solid #222;
+            transition: all 0.1s ease;
+            -webkit-tap-highlight-color: transparent; /* ลบสีฟ้าเวลาแตะบนมือถือ */
+        }
+        /* เอฟเฟกต์ตอนแตะ */
+        .ultra-card:active {
+            background: #222;
+            border-color: #FE2C55;
+            transform: scale(0.98);
+        }
+        /* ไฟกะพริบตอนก๊อปปี้สำเร็จ */
+        .copied-flash {
+            animation: flash 0.4s ease;
+        }
+        @keyframes flash {
+            0% { background-color: #222; }
+            50% { background-color: #FE2C55; }
+            100% { background-color: #111; }
+        }
+    </style>
+</head>
+<body class="p-2 flex flex-col items-center min-h-screen">
+
+    <div class="w-full max-w-md space-y-2">
+        <header class="text-center py-4">
+            <h1 class="text-xl font-bold text-gray-400 tracking-widest uppercase">Tap to Copy</h1>
+            <p class="text-[10px] text-gray-600">แตะที่แถบสีเทาเพื่อก๊อปปี้แท็กทันที</p>
+        </header>
+
+        <div id="listContainer" class="grid grid-cols-1 gap-2 pb-20">
+            </div>
+    </div>
+
+    <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white text-black px-8 py-4 rounded-2xl font-bold shadow-2xl transition-all opacity-0 pointer-events-none z-50">
+        COPIED! ✅
+    </div>
+
+    <script>
+        const tagList = [
+            "#RoV #RoVเป็นเกมตลก #คลิปRoV",
+            "#RoV #คลิปRoV #rovth",
+            "#RoV #ควิกแชทนี้พี่จัดให้ #หยุดโลกด้วยเสียง #GildurPASULOL",
+            "#RoV #Flowborn #ฮีโร่ใหม่RoV #FlowbornPreheat",
+            "#RoV #RoVเป็นเกมตลก #rovth",
+            "#RoV #RoVเป็นเกมตลก #fpy",
+            "#RoV #RoVเป็นเกมตลก #trending",
+            "#RoV #RoVเป็นเกมตลก #เล่นRoV",
+            "#RoV #RoVเป็นเกมตลก #RoVเกมภาพสวย",
+            "#RoV #rovth #RoVThailand",
+            "#RoV #ควิกแชทนี้พี่จัดให้ #TeamKongInRoV",
+            "#RoV #RoVเรียกเพื่อนกลับบ้าน #CallbackRoV",
+            "#RoV #RoVเป็นเกมตลก #บัฟปรับใหม่ฮีโร่RoV",
+            "#RoV #DesperateFight #RoVอัปเดตแพทช์ใหม่",
+            "#RoV #FlowbornGuide #ฮีโร่ใหม่RoV #RoVFlowborn",
+            "#RoV #ROVThailand #สกินMythicalเล่นฟรี",
+            "#RoV #ROVThailand #RoVเปิดหมดทุกโหมด",
+            "#RoV #rovth #fpy",
+            "#RoV #rovth #trending",
+            "#RoV #rovth #เล่นRoV",
+            "#RoV #rovth #RoVเกมภาพสวย"
+        ];
+
+        function render() {
+            const container = document.getElementById('listContainer');
+            tagList.forEach((tag, index) => {
+                const div = document.createElement('div');
+                div.id = `card-${index}`;
+                div.className = "ultra-card w-full p-5 rounded-xl flex items-center gap-4 cursor-pointer select-none";
+                div.onclick = () => copyTags(tag, index);
+                div.innerHTML = `
+                    <div class="bg-gray-800 text-gray-400 w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold flex-shrink-0">
+                        ${index + 1}
+                    </div>
+                    <div class="text-sm text-gray-300 font-medium leading-tight">
+                        ${tag}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function copyTags(text, index) {
+            navigator.clipboard.writeText(text).then(() => {
+                const card = document.getElementById(`card-${index}`);
+                card.classList.add('copied-flash');
+                setTimeout(() => card.classList.remove('copied-flash'), 400);
+                showToast();
+            });
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.style.opacity = "1";
+            toast.style.transform = "translate(-50%, -50%) scale(1.1)";
+            setTimeout(() => {
+                toast.style.opacity = "0";
+                toast.style.transform = "translate(-50%, -50%) scale(1)";
+            }, 600);
+        }
+
+        render();
+    </script>
+</body>
+</html>
