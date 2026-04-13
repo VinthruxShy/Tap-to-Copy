@@ -116,7 +116,6 @@
             padding: 4px 12px;
             border-radius: 99px;
             font-weight: 700;
-            background: rgba(255, 255, 255, 0.05);
         }
     </style>
 </head>
@@ -144,13 +143,28 @@
             </div>
 
             <!-- Buffer Section -->
-            <div class="bg-black/40 p-5 rounded-[28px] border border-white/5 mb-6">
+            <div class="bg-black/40 p-5 rounded-[28px] border border-white/5 mb-4 shadow-inner">
                 <div class="flex justify-between items-center mb-2.5 px-1">
                     <label class="text-[10px] text-zinc-400 uppercase font-bold italic">บวกวิวกันขาด / คลิป (+)</label>
                     <span id="extraLabel" class="text-[10px] font-black text-[#fe2c55] tracking-widest">0 EXTRA</span>
                 </div>
                 <input type="number" id="inputExtra" step="100" oninput="recalc()" value="0"
                     class="w-full text-center font-bold text-xl">
+            </div>
+
+            <!-- Rate Comparison Input -->
+            <div class="flex items-end justify-between mb-6 px-1 border-b border-white/5 pb-4">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">เรทอ้างอิงเปรียบเทียบ:</label>
+                    <div class="flex items-center gap-2">
+                        <input type="number" id="baseRateInput" step="0.0001" oninput="recalc()" value="0.6445"
+                            class="bg-transparent border-b border-zinc-800 text-[14px] font-bold text-zinc-300 focus:text-white focus:border-[#fe2c55] w-20 outline-none transition-all pb-0.5">
+                        <button onclick="setAsBase()" class="text-[9px] text-[#fe2c55] font-bold uppercase hover:underline bg-[#fe2c55]/10 px-2.5 py-1.5 rounded-xl transition-all">ดึงเรทปัจจุบัน</button>
+                    </div>
+                </div>
+                <div id="diffContainer" class="hidden pb-1">
+                    <span id="diffBadge" class="diff-badge"></span>
+                </div>
             </div>
 
             <!-- Main Stat Display -->
@@ -287,8 +301,15 @@
             updateUI();
         }
 
+        function setAsBase() {
+            const current = document.getElementById('inputRate').value;
+            document.getElementById('baseRateInput').value = current;
+            recalc();
+        }
+
         function recalc() {
             const rate = parseFloat(document.getElementById('inputRate').value) || 0;
+            const baseRateInput = parseFloat(document.getElementById('baseRateInput').value) || 0;
             const extra = parseInt(document.getElementById('inputExtra').value) || 0;
             
             const baseSum = selected.reduce((sum, id) => {
@@ -298,12 +319,34 @@
 
             const extraSum = selected.length * extra;
             const totalSum = baseSum + extraSum;
+            
             const cash = (totalSum / 1000) * rate;
+            const baseCash = (totalSum / 1000) * baseRateInput;
+            const diff = cash - baseCash;
 
             document.getElementById('displayPrice').innerText = cash.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
             document.getElementById('displayTotalViews').innerText = totalSum.toLocaleString();
             document.getElementById('extraLabel').innerText = `${extraSum.toLocaleString()} EXTRA VIEWS`;
             document.getElementById('displaySubStats').innerText = `BASE: ${baseSum.toLocaleString()} • BUFFER: ${extraSum.toLocaleString()}`;
+
+            // Comparison Badge Logic
+            const diffContainer = document.getElementById('diffContainer');
+            const diffBadge = document.getElementById('diffBadge');
+            
+            if (rate !== baseRateInput && selected.length > 0) {
+                diffContainer.classList.remove('hidden');
+                if (diff > 0) {
+                    diffBadge.innerText = `+${diff.toFixed(2)} THB`;
+                    diffBadge.style.backgroundColor = 'rgba(34, 197, 94, 0.15)';
+                    diffBadge.style.color = '#22c55e';
+                } else {
+                    diffBadge.innerText = `${diff.toFixed(2)} THB`;
+                    diffBadge.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
+                    diffBadge.style.color = '#ef4444';
+                }
+            } else {
+                diffContainer.classList.add('hidden');
+            }
         }
 
         function updateUI() {
@@ -315,11 +358,12 @@
 
         function copyMsg(mode) {
             const rate = document.getElementById('inputRate').value;
+            const baseRateVal = document.getElementById('baseRateInput').value;
             const extra = document.getElementById('inputExtra').value;
             const finalViews = document.getElementById('displayTotalViews').innerText;
             const finalPrice = document.getElementById('displayPrice').innerText;
             
-            const baseViews = selected.reduce((sum, id) => {
+            const baseSum = selected.reduce((sum, id) => {
                 const clip = clipDatabase.find(c => c.id === id);
                 return sum + (clip ? clip.v : 0);
             }, 0);
@@ -335,7 +379,10 @@
                 }).join('\n');
                 finalOutput = `ลูกค้ารับคลิปตามแท็กด้านล่างนี้ได้เลยย\n━━━━━━━━━━━━━━━━\n${tagsOnly}\n━━━━━━━━━━━━━━━━`;
             } else {
-                finalOutput = `📋 สรุปยอดขาย (Internal Report)\n━━━━━━━━━━━━━━━━\n🎬 จำนวน: ${selected.length} คลิป\n📈 วิวพื้นฐาน: ${baseViews.toLocaleString()}\n➕ วิวกันขาด (+${extra}/คลิป): ${extraSum.toLocaleString()}\n📊 วิวรวมสุทธิ: ${finalViews}\n💵 เรทราคา: ${rate}\n💰 รวมเงินสุทธิ: ${finalPrice} บาท\n━━━━━━━━━━━━━━━━\n📅 ${new Date().toLocaleDateString('th-TH')} ${new Date().toLocaleTimeString('th-TH')}`;
+                const diff = (parseFloat(rate) - parseFloat(baseRateVal)) * ( (baseSum + extraSum) / 1000 );
+                const diffTxt = rate != baseRateVal ? `\n⚠️ ส่วนต่างเรทฐาน: ${diff > 0 ? '+' : ''}${diff.toFixed(2)} บาท` : '';
+
+                finalOutput = `📋 สรุปยอดขาย (Internal Report)\n━━━━━━━━━━━━━━━━\n🎬 จำนวน: ${selected.length} คลิป\n📈 วิวพื้นฐาน: ${baseSum.toLocaleString()}\n➕ วิวกันขาด (+${extra}/คลิป): ${extraSum.toLocaleString()}\n📊 วิวรวมสุทธิ: ${finalViews}\n💵 เรทราคา: ${rate}${diffTxt}\n💰 รวมเงินสุทธิ: ${finalPrice} บาท\n━━━━━━━━━━━━━━━━\n📅 ${new Date().toLocaleDateString('th-TH')} ${new Date().toLocaleTimeString('th-TH')}`;
             }
 
             const clipboardHelper = document.createElement('textarea');
@@ -347,7 +394,7 @@
 
             const targetBtn = mode === 'customer' ? 'btnCust' : 'btnSell';
             const originalContent = document.getElementById(targetBtn).innerHTML;
-            document.getElementById(targetBtn).innerText = "COPIED ✅";
+            document.getElementById(targetBtn).innerText = "คัดลอกสำเร็จแล้ว! ✅";
             setTimeout(() => { document.getElementById(targetBtn).innerHTML = originalContent; }, 1500);
         }
 
