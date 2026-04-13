@@ -3,79 +3,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RoV Calc - Vinthrux</title>
+    <title>RoV Calc Pro - Vinthrux</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Chakra Petch', sans-serif; background-color: #000; color: #fff; overflow-x: hidden; }
-        .glass-card { background: rgba(17, 17, 17, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 24px; }
-        .active-chip { background: linear-gradient(45deg, #FE2C55, #ff5e7d) !important; color: #fff !important; border-color: transparent !important; }
-        .nav-professional { background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(15px); border-top: 1px solid rgba(255, 255, 255, 0.05); }
-        .nav-item-active::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 20px; height: 3px; background-color: #FE2C55; border-radius: 2px; box-shadow: 0 0 10px rgba(254, 44, 85, 0.7); }
-        input:focus { border-color: #FE2C55 !important; outline: none; }
-        #clipList::-webkit-scrollbar { width: 4px; }
-        #clipList::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        body { 
+            font-family: 'Chakra Petch', sans-serif; 
+            background-color: #09090b; 
+            color: #ffffff; 
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            padding-bottom: 160px;
+        }
+
+        /* Dashboard Box with Soft Shadow */
+        .dashboard-box {
+            background-color: #121217;
+            border: 1px solid rgba(254, 44, 85, 0.2);
+            border-radius: 32px;
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 20px rgba(254, 44, 85, 0.05);
+        }
+
+        /* Softer Clip Cards */
+        .clip-card {
+            background-color: #18181b;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 24px;
+            padding: 1.15rem 1.5rem;
+            margin-bottom: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            user-select: none;
+        }
+
+        .clip-card:hover {
+            border-color: rgba(254, 44, 85, 0.3);
+            background-color: #1c1c21;
+        }
+
+        .clip-card.active {
+            background: linear-gradient(135deg, #fe2c55 0%, #ff5e7d 100%);
+            border-color: transparent;
+            transform: scale(1.03);
+            box-shadow: 0 12px 25px rgba(254, 44, 85, 0.35);
+        }
+
+        .price-display {
+            font-size: 4.2rem;
+            font-weight: 700;
+            color: #fe2c55;
+            line-height: 1;
+            text-shadow: 0 8px 15px rgba(254, 44, 85, 0.25);
+            letter-spacing: -2px;
+        }
+
+        /* Softer Inputs */
+        input {
+            background-color: #09090b !important;
+            border: 1px solid #27272a !important;
+            border-radius: 20px !important;
+            color: white !important;
+            padding: 0.85rem !important;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            border-color: #fe2c55 !important;
+            background-color: #000000 !important;
+            box-shadow: 0 0 0 4px rgba(254, 44, 85, 0.1) !important;
+            outline: none;
+        }
+
+        /* Buttons with smooth feel */
+        .btn-action {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .btn-action:active {
+            transform: scale(0.92);
+            filter: brightness(0.9);
+        }
+
+        .bottom-tabs {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(9, 9, 11, 0.85);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1rem 1rem 2.8rem 1rem;
+            display: flex;
+            justify-content: space-around;
+            z-index: 1000;
+        }
+
+        .diff-badge {
+            font-size: 10px;
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.05);
+        }
     </style>
 </head>
-<body class="p-4 flex flex-col items-center min-h-screen">
+<body>
 
-    <div class="w-full max-w-md space-y-4 mb-28">
-        <header class="text-center py-6 border-b border-gray-900 mb-2">
-            <h1 class="text-2xl font-bold tracking-tighter text-white uppercase">Pro <span class="text-[#FE2C55]">Calculator</span></h1>
-            <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Enter amount or select clips</p>
+    <div class="app-container">
+        <header class="text-center py-8">
+            <h1 class="text-4xl font-bold italic tracking-tighter">ROV <span class="text-[#fe2c55]">CALC</span> PRO</h1>
+            <p class="text-[10px] text-zinc-500 uppercase tracking-[0.4em] mt-1 font-bold">PREMIUM SOFT UI VERSION</p>
         </header>
 
-        <div class="glass-card p-6 shadow-2xl sticky top-2 z-30 border-[#FE2C55]/20 border">
-            <div class="grid grid-cols-2 gap-3 mb-4">
+        <!-- Main Dashboard -->
+        <div class="dashboard-box">
+            <div class="grid grid-cols-2 gap-4 mb-5">
                 <div>
-                    <label class="text-[10px] text-gray-500 uppercase tracking-widest ml-1">จำนวนคลิป (1-22)</label>
-                    <input type="number" id="clipAmountInput" min="0" max="22" oninput="autoSelectClips()" placeholder="0"
-                        class="w-full bg-black border border-gray-800 p-3 rounded-xl font-bold text-white transition-all">
+                    <label class="text-[10px] text-zinc-500 uppercase font-bold mb-1.5 block tracking-widest px-1">เลือกด่วน (1-22)</label>
+                    <input type="number" id="inputAmount" min="0" max="22" oninput="autoSelect()" placeholder="0"
+                        class="w-full text-center font-bold text-xl">
                 </div>
                 <div>
-                    <label class="text-[10px] text-gray-500 uppercase tracking-widest ml-1">เรทราคา / 1k วิว</label>
-                    <input type="number" id="currentRate" step="0.001" oninput="calculate()" placeholder="0.015"
-                        class="w-full bg-black border border-gray-800 p-3 rounded-xl font-bold text-white transition-all">
+                    <label class="text-[10px] text-zinc-500 uppercase font-bold mb-1.5 block text-[#fe2c55] tracking-widest px-1">เรทราคา</label>
+                    <input type="number" id="inputRate" step="0.0001" oninput="recalc()" value="0.6445"
+                        class="w-full text-center font-bold text-xl">
                 </div>
             </div>
 
-            <div class="py-6 bg-black/50 rounded-2xl border border-gray-800 text-center">
-                <div class="text-[10px] text-gray-500 uppercase mb-1">ยอดวิวรวม: <span id="totalViewsDisplay" class="text-white font-bold">0</span></div>
-                <div class="text-4xl font-bold text-white" id="totalPrice">0.00</div>
-                <div class="text-[#FE2C55] text-xs font-bold uppercase tracking-widest mt-1">Thai Baht</div>
+            <!-- Buffer Section -->
+            <div class="bg-black/40 p-5 rounded-[28px] border border-white/5 mb-6">
+                <div class="flex justify-between items-center mb-2.5 px-1">
+                    <label class="text-[10px] text-zinc-400 uppercase font-bold italic">บวกวิวกันขาด / คลิป (+)</label>
+                    <span id="extraLabel" class="text-[10px] font-black text-[#fe2c55] tracking-widest">0 EXTRA</span>
+                </div>
+                <input type="number" id="inputExtra" step="100" oninput="recalc()" value="0"
+                    class="w-full text-center font-bold text-xl">
             </div>
 
-            <button onclick="copySummary()" id="copyBtn" class="w-full mt-4 py-4 bg-[#FE2C55] text-white font-bold rounded-xl hidden active:scale-95 transition-all text-sm uppercase tracking-widest">
-                📋 Copy Summary
-            </button>
+            <!-- Main Stat Display -->
+            <div class="text-center bg-black/50 py-10 rounded-[40px] border border-zinc-800/50 shadow-inner relative overflow-hidden">
+                <div id="statBadge" class="absolute top-4 right-6 text-[9px] font-bold text-zinc-600 uppercase tracking-[0.2em]">SELECTED: 0/22</div>
+                
+                <div class="mb-8">
+                    <div class="text-[11px] text-zinc-500 uppercase font-bold mb-3 tracking-[0.2em]">ยอดรวมสุทธิ</div>
+                    <div class="price-display" id="displayPrice">0.00</div>
+                    <div class="text-zinc-600 text-[10px] font-bold mt-3 uppercase tracking-widest">THB Currency</div>
+                </div>
+                
+                <div class="w-2/3 h-[1px] bg-zinc-800/50 mx-auto mb-8"></div>
+                
+                <div class="px-6">
+                    <div class="text-[11px] text-zinc-500 uppercase font-bold mb-1.5 tracking-widest">ยอดวิวรวมสุทธิ</div>
+                    <div class="text-4xl font-bold tracking-tight" id="displayTotalViews">0</div>
+                    <div id="displaySubStats" class="text-[10px] text-zinc-700 font-bold mt-3 uppercase tracking-widest">BASE: 0 • BUFFER: 0</div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div id="copyPanel" class="grid grid-cols-2 gap-4 mt-8 hidden">
+                <button onclick="copyMsg('customer')" id="btnCust" class="btn-action py-5 bg-zinc-800/50 hover:bg-zinc-800 text-white text-[11px] font-bold rounded-[24px] border border-white/5 uppercase tracking-wider flex flex-col items-center shadow-lg">
+                    <span>👤 ส่งให้ลูกค้า</span>
+                    <span class="text-[7.5px] opacity-40 font-normal mt-1.5">(เฉพาะรายการแท็ก)</span>
+                </button>
+                <button onclick="copyMsg('seller')" id="btnSell" class="btn-action py-5 bg-[#fe2c55] hover:bg-[#ff456a] text-white text-[11px] font-bold rounded-[24px] shadow-xl shadow-[#fe2c55]/20 uppercase tracking-wider flex flex-col items-center">
+                    <span>💰 สำหรับคนขาย</span>
+                    <span class="text-[7.5px] text-white/60 font-normal mt-1.5">(สถิติ & ยอดเงิน)</span>
+                </button>
+            </div>
         </div>
 
-        <div class="glass-card p-5">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-[11px] text-gray-500 uppercase tracking-widest font-bold">🎬 รายการคลิปที่เลือก</h3>
-                <button onclick="clearSelection()" class="text-[10px] text-red-500 font-bold uppercase">Clear</button>
+        <!-- Manual Selection Area -->
+        <div class="w-full bg-[#0c0c0e] p-7 rounded-[40px] border border-zinc-900 shadow-2xl">
+            <div class="flex justify-between items-center mb-8 px-1">
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-6 bg-[#fe2c55] rounded-full shadow-[0_0_10px_#fe2c55]"></div>
+                    <h3 class="text-[14px] font-black uppercase tracking-[0.2em] text-white">รายการคลิปทั้งหมด</h3>
+                </div>
+                <button onclick="resetAll()" class="text-[11px] font-bold text-zinc-600 hover:text-red-500 uppercase tracking-widest transition-colors">ล้างทั้งหมด</button>
             </div>
-            <div id="clipList" class="space-y-2 max-h-72 overflow-y-auto pr-2"></div>
+            
+            <div id="listView">
+                <!-- Javascript will render 22 clips here -->
+            </div>
         </div>
     </div>
 
-    <nav class="fixed bottom-0 left-0 right-0 nav-professional p-4 flex justify-around items-center z-40 pb-6 rounded-t-3xl">
-        <a href="index.html" class="nav-item flex flex-col items-center gap-1.5 text-gray-500 hover:text-white transition-colors">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            <span class="text-[11px] font-medium uppercase tracking-wider">Tags</span>
-        </a>
-        <a href="mission.html" class="nav-item flex flex-col items-center gap-1.5 text-gray-500 hover:text-white transition-colors">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12z"></path></svg>
-            <span class="text-[11px] font-medium uppercase tracking-wider">Mission</span>
-        </a>
-        <a href="calc.html" class="nav-item nav-item-active relative flex flex-col items-center gap-1.5 text-[#FE2C55]">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h2a2 2 0 002-2zm6-10V7a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2zm0 0v10a2 2 0 002 2h2a2 2 0 002-2v-10a2 2 0 002 2h2a2 2 0 002-2z"></path></svg>
-            <span class="text-[11px] font-medium uppercase tracking-wider">Calc</span>
-        </a>
-    </nav>
+    <!-- Fixed Tabs -->
+    <div class="bottom-tabs">
+        <div class="flex flex-col items-center gap-1.5 text-zinc-700 opacity-40">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <span class="text-[9px] font-black uppercase tracking-tighter">Tags</span>
+        </div>
+        <div class="flex flex-col items-center gap-1.5 text-zinc-700 opacity-40">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12z"></path></svg>
+            <span class="text-[9px] font-black uppercase tracking-tighter">Mission</span>
+        </div>
+        <div class="flex flex-col items-center gap-1.5 text-[#fe2c55]">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h2a2 2 0 002-2zm6-10V7a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2zm0 0v10a2 2 0 002 2h2a2 2 0 002-2v-10z"></path></svg>
+            <span class="text-[9px] font-black uppercase tracking-tighter">Calc</span>
+        </div>
+    </div>
 
     <script>
-        const rovClips = [
+        const clipDatabase = [
             { id: 1, tags: "#RoV #RoVเป็นเกมตลก #คลิปRoV", v: 6000 },
             { id: 2, tags: "#RoV #คลิปRoV #rovth", v: 6000 },
             { id: 3, tags: "#RoV #ควิกแชทนี้พี่จัดให้ #หยุดโลกด้วยเสียง #GildurPASULOL", v: 8000 },
@@ -100,93 +243,115 @@
             { id: 22, tags: "#RoV #rovth #คลิปRoV", v: 10000 }
         ];
 
-        let selectedClipIds = [];
+        let selected = [];
 
-        function autoSelectClips() {
-            const amount = parseInt(document.getElementById('clipAmountInput').value) || 0;
-            const finalAmount = Math.min(Math.max(amount, 0), 22);
-            
-            // เลือกคลิป 1 ถึง N ตามจำนวนที่กรอก
-            selectedClipIds = [];
-            for (let i = 0; i < finalAmount; i++) {
-                selectedClipIds.push(rovClips[i].id);
+        function render() {
+            const listContainer = document.getElementById('listView');
+            listContainer.innerHTML = '';
+            clipDatabase.forEach(item => {
+                const isActive = selected.includes(item.id);
+                const div = document.createElement('div');
+                div.className = `clip-card ${isActive ? 'active' : ''}`;
+                div.onclick = () => toggle(item.id);
+                div.innerHTML = `
+                    <div class="text-[12.5px] font-bold opacity-90 leading-snug pr-4 select-none">${item.tags}</div>
+                    <div class="font-black text-xl select-none">${(item.v/1000)}k</div>
+                `;
+                listContainer.appendChild(div);
+            });
+        }
+
+        function toggle(id) {
+            if (selected.includes(id)) {
+                selected = selected.filter(i => i !== id);
+            } else {
+                selected.push(id);
+            }
+            document.getElementById('inputAmount').value = selected.length || "";
+            updateUI();
+        }
+
+        function autoSelect() {
+            const val = parseInt(document.getElementById('inputAmount').value) || 0;
+            const amount = Math.min(Math.max(val, 0), 22);
+            selected = [];
+            for (let i = 0; i < amount; i++) {
+                selected.push(clipDatabase[i].id);
             }
             updateUI();
         }
 
-        function toggleClip(id) {
-            selectedClipIds = selectedClipIds.includes(id) ? selectedClipIds.filter(i => i !== id) : [...selectedClipIds, id];
-            // ล้างค่าในช่อง Input เพราะสถานะการเลือกเปลี่ยนไปแบบ Manual
-            document.getElementById('clipAmountInput').value = "";
+        function resetAll() {
+            selected = [];
+            document.getElementById('inputAmount').value = "";
             updateUI();
         }
 
-        function renderClips() {
-            const list = document.getElementById('clipList');
-            list.innerHTML = '';
-            rovClips.forEach(clip => {
-                const isActive = selectedClipIds.includes(clip.id);
-                const div = document.createElement('div');
-                div.className = `p-4 rounded-2xl border border-gray-900 cursor-pointer transition-all ${isActive ? 'active-chip' : 'bg-black/40 text-gray-300 hover:border-gray-700'}`;
-                div.onclick = () => toggleClip(clip.id);
-                div.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <div class="text-[12px] font-medium leading-relaxed mr-4">${clip.tags}</div>
-                        <div class="font-bold text-xs">${(clip.v/1000)}k</div>
-                    </div>
-                `;
-                list.appendChild(div);
-            });
-        }
+        function recalc() {
+            const rate = parseFloat(document.getElementById('inputRate').value) || 0;
+            const extra = parseInt(document.getElementById('inputExtra').value) || 0;
+            
+            const baseSum = selected.reduce((sum, id) => {
+                const clip = clipDatabase.find(c => c.id === id);
+                return sum + (clip ? clip.v : 0);
+            }, 0);
 
-        function clearSelection() {
-            selectedClipIds = [];
-            document.getElementById('clipAmountInput').value = "";
-            updateUI();
+            const extraSum = selected.length * extra;
+            const totalSum = baseSum + extraSum;
+            const cash = (totalSum / 1000) * rate;
+
+            document.getElementById('displayPrice').innerText = cash.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('displayTotalViews').innerText = totalSum.toLocaleString();
+            document.getElementById('extraLabel').innerText = `${extraSum.toLocaleString()} EXTRA VIEWS`;
+            document.getElementById('displaySubStats').innerText = `BASE: ${baseSum.toLocaleString()} • BUFFER: ${extraSum.toLocaleString()}`;
         }
 
         function updateUI() {
-            renderClips();
-            const totalViews = selectedClipIds.reduce((sum, id) => {
-                const clip = rovClips.find(c => c.id === id);
-                return sum + (clip ? clip.v : 0);
-            }, 0);
-            document.getElementById('totalViewsDisplay').innerText = totalViews.toLocaleString();
-            document.getElementById('selectedCount').innerText = `SELECTED: ${selectedClipIds.length} CLIPS`;
-            document.getElementById('copyBtn').classList.toggle('hidden', selectedClipIds.length === 0);
-            calculate();
+            render();
+            document.getElementById('statBadge').innerText = `SELECTED: ${selected.length}/22`;
+            document.getElementById('copyPanel').classList.toggle('hidden', selected.length === 0);
+            recalc();
         }
 
-        function calculate() {
-            const rate = parseFloat(document.getElementById('currentRate').value) || 0;
-            const totalViews = selectedClipIds.reduce((sum, id) => {
-                const clip = rovClips.find(c => c.id === id);
+        function copyMsg(mode) {
+            const rate = document.getElementById('inputRate').value;
+            const extra = document.getElementById('inputExtra').value;
+            const finalViews = document.getElementById('displayTotalViews').innerText;
+            const finalPrice = document.getElementById('displayPrice').innerText;
+            
+            const baseViews = selected.reduce((sum, id) => {
+                const clip = clipDatabase.find(c => c.id === id);
                 return sum + (clip ? clip.v : 0);
             }, 0);
-            const total = (totalViews / 1000) * rate;
-            document.getElementById('totalPrice').innerText = total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            const extraSum = selected.length * extra;
+
+            const sorted = [...selected].sort((a, b) => a - b);
+            
+            let finalOutput = "";
+            if (mode === 'customer') {
+                let tagsOnly = sorted.map((id, index) => {
+                    const clip = clipDatabase.find(c => c.id === id);
+                    return `${index + 1}. ${clip.tags}`;
+                }).join('\n');
+                finalOutput = `ลูกค้ารับคลิปตามแท็กด้านล่างนี้ได้เลยย\n━━━━━━━━━━━━━━━━\n${tagsOnly}\n━━━━━━━━━━━━━━━━`;
+            } else {
+                finalOutput = `📋 สรุปยอดขาย (Internal Report)\n━━━━━━━━━━━━━━━━\n🎬 จำนวน: ${selected.length} คลิป\n📈 วิวพื้นฐาน: ${baseViews.toLocaleString()}\n➕ วิวกันขาด (+${extra}/คลิป): ${extraSum.toLocaleString()}\n📊 วิวรวมสุทธิ: ${finalViews}\n💵 เรทราคา: ${rate}\n💰 รวมเงินสุทธิ: ${finalPrice} บาท\n━━━━━━━━━━━━━━━━\n📅 ${new Date().toLocaleDateString('th-TH')} ${new Date().toLocaleTimeString('th-TH')}`;
+            }
+
+            const clipboardHelper = document.createElement('textarea');
+            clipboardHelper.value = finalOutput;
+            document.body.appendChild(clipboardHelper);
+            clipboardHelper.select();
+            document.execCommand('copy');
+            document.body.removeChild(clipboardHelper);
+
+            const targetBtn = mode === 'customer' ? 'btnCust' : 'btnSell';
+            const originalContent = document.getElementById(targetBtn).innerHTML;
+            document.getElementById(targetBtn).innerText = "COPIED ✅";
+            setTimeout(() => { document.getElementById(targetBtn).innerHTML = originalContent; }, 1500);
         }
 
-        function copySummary() {
-            const rate = document.getElementById('currentRate').value;
-            const total = document.getElementById('totalPrice').innerText;
-            const totalViews = selectedClipIds.reduce((sum, id) => {
-                const clip = rovClips.find(c => c.id === id);
-                return sum + (clip ? clip.v : 0);
-            }, 0);
-            let details = selectedClipIds.map((id, index) => {
-                const clip = rovClips.find(c => c.id === id);
-                return `${index + 1}. ${clip.tags} (${clip.v/1000}k)`;
-            }).join('\n');
-            const text = `📊 สรุปงานปั๊มวิว RoV\n━━━━━━━━━━━━━━\n${details}\n━━━━━━━━━━━━━━\n🎬 ทั้งหมด: ${selectedClipIds.length} คลิป\n📈 ยอดวิวรวม: ${totalViews.toLocaleString()} วิว\n💵 เรทวันนี้: ${rate}\n💰 รวมสุทธิ: ${total} บาท\n━━━━━━━━━━━━━━`;
-            navigator.clipboard.writeText(text).then(() => {
-                const btn = document.getElementById('copyBtn');
-                btn.innerText = "COPIED ✅";
-                setTimeout(() => btn.innerText = "📋 Copy Summary", 2000);
-            });
-        }
-
-        renderClips();
+        window.onload = render;
     </script>
 </body>
 </html>
