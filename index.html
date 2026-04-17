@@ -10,6 +10,8 @@
         body { font-family: 'Chakra Petch', sans-serif; background-color: #000; color: #fff; overflow-x: hidden; }
         .ultra-card { background: #111; border: 1px solid #222; transition: all 0.1s ease; -webkit-tap-highlight-color: transparent; }
         .ultra-card:active { background: #222; border-color: #FE2C55; transform: scale(0.98); }
+        .special-card { border-color: #00f2ff33; background: linear-gradient(145deg, #111, #001a1d); }
+        .special-card:active { border-color: #00f2ff; }
         .copied-flash { animation: flash 0.4s ease; }
         @keyframes flash { 0% { background-color: #222; } 50% { background-color: #FE2C55; } 100% { background-color: #111; } }
         .nav-professional { background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(15px); border-top: 1px solid rgba(255, 255, 255, 0.05); }
@@ -18,9 +20,9 @@
 </head>
 <body class="p-2 flex flex-col items-center min-h-screen relative">
 
-    <div class="w-full max-w-md space-y-2 mb-28">
+    <div class="w-full max-w-md space-y-4 mb-28">
         <header class="text-center py-6 border-b border-gray-900 mb-4">
-            <h1 class="text-2xl font-bold tracking-tighter text-white uppercase">RoV <span class="text-[#FE2C55]">Tag</span> Deck</h1>
+            <h1 class="text-2xl font-bold tracking-tighter text-white uppercase italic">RoV <span class="text-[#FE2C55]">Tag</span> Deck</h1>
             <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Tap card to copy tags instantly</p>
         </header>
 
@@ -29,41 +31,58 @@
 
     <div id="toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#FE2C55] text-white px-8 py-4 rounded-xl font-bold shadow-2xl transition-all opacity-0 pointer-events-none z-50 text-sm">COPIED! ✅</div>
 
-    <nav class="fixed bottom-0 left-0 right-0 nav-professional p-4 flex justify-around items-center z-40 pb-6 rounded-t-3xl">
-        
+    <nav class="fixed bottom-0 left-0 right-0 nav-professional p-4 flex justify-around items-center z-40 pb-6 rounded-t-3xl shadow-[0_-10px_20px_rgba(0,0,0,0.5)]">
         <a href="index.html" class="nav-item nav-item-active relative flex flex-col items-center gap-1.5 text-[#FE2C55]">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
             <span class="text-[11px] font-medium uppercase tracking-wider">Tags</span>
         </a>
         
         <a href="mission.html" class="nav-item flex flex-col items-center gap-1.5 text-gray-500 hover:text-white transition-colors">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12z"></path></svg>
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
             <span class="text-[11px] font-medium uppercase tracking-wider">Mission</span>
         </a>
         
         <a href="calc.html" class="nav-item flex flex-col items-center gap-1.5 text-gray-500 hover:text-white transition-colors">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h2a2 2 0 002-2zm6-10V7a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2zm0 0v10a2 2 0 002 2h2a2 2 0 002-2v-10a2 2 0 002 2h2a2 2 0 002-2z"></path></svg>
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h2a2 2 0 002-2zm6-10V7a2 2 0 00-2-2h-2a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2zm0 0v10a2 2 0 002 2h2a2 2 0 002-2v-10a2 2 0 002-2z"></path></svg>
             <span class="text-[11px] font-medium uppercase tracking-wider">Calc</span>
         </a>
     </nav>
 
     <script>
         const tagList = [
-            "#RoV #RoVเป็นเกมตลก #คลิปRoV", "#RoV #คลิปRoV #rovth", "#RoV #ควิกแชทนี้พี่จัดให้ #หยุดโลกด้วยเสียง #GildurPASULOL",
-            "#RoV #Flowborn #ฮีโร่ใหม่RoV #FlowbornPreheat", "#RoV #RoVเป็นเกมตลก #rovth", "#RoV #RoVเป็นเกมตลก #fpy",
-            "#RoV #RoVเป็นเกมตลก #trending", "#RoV #RoVเป็นเกมตลก #เล่นRoV", "#RoV #RoVเป็นเกมตลก #RoVเกมภาพสวย",
-            "#RoV #rovth #RoVThailand", "#RoV #ควิกแชทนี้พี่จัดให้ #TeamKongInRoV", "#RoV #RoVเรียกเพื่อนกลับบ้าน #CallbackRoV",
-            "#RoV #RoVเป็นเกมตลก #บัฟปรับใหม่ฮีโร่RoV", "#RoV #DesperateFight #RoVอัปเดตแพทช์ใหม่", "#RoV #FlowbornGuide #ฮีโร่ใหม่RoV #RoVFlowborn",
-            "#RoV #ROVThailand #สกินMythicalเล่นฟรี", "#RoV #ROVThailand #RoVเปิดหมดทุกโหมด", "#RoV #rovth #fpy",
-            "#RoV #rovth #trending", "#RoV #rovth #เล่นRoV", "#RoV #rovth #RoVเกมภาพสวย", "#RoV #rovth #คลิปRoV"
+            "#RoV #RoVเป็นเกมตลก #คลิปRoV", 
+            "#RoV #คลิปRoV #rovth", 
+            "#RoV #ควิกแชทนี้พี่จัดให้ #หยุดโลกด้วยเสียง #GildurPASULOL",
+            "#RoV #Flowborn #ฮีโร่ใหม่RoV #FlowbornPreheat", 
+            "#RoV #RoVเป็นเกมตลก #rovth", 
+            "#RoV #RoVเป็นเกมตลก #fpy",
+            "#RoV #RoVเป็นเกมตลก #trending", 
+            "#RoV #RoVเป็นเกมตลก #เล่นRoV", 
+            "#RoV #RoVเป็นเกมตลก #RoVเกมภาพสวย",
+            "#RoV #rovth #RoVThailand", 
+            "#RoV #ควิกแชทนี้พี่จัดให้ #TeamKongInRoV", 
+            "#RoV #RoVเรียกเพื่อนกลับบ้าน #CallbackRoV",
+            "#RoV #RoVเป็นเกมตลก #บัฟปรับใหม่ฮีโร่RoV", 
+            "#RoV #DesperateFight #RoVอัปเดตแพทช์ใหม่", 
+            "#RoV #FlowbornGuide #ฮีโร่ใหม่RoV #RoVFlowborn",
+            "#RoV #ROVThailand #สกินMythicalเล่นฟรี", 
+            "#RoV #ROVThailand #RoVเปิดหมดทุกโหมด", 
+            "#RoV #rovth #fpy",
+            "#RoV #rovth #trending", 
+            "#RoV #rovth #เล่นRoV", 
+            "#RoV #rovth #RoVเกมภาพสวย", 
+            "#RoV #rovth #คลิปRoV",
+            "#RoV #ฉันเชียร์ทีมนี้ #GodlikeCreatorCup #RoVThailand" // แท็กที่ 23
         ];
 
         function render() {
             const list = document.getElementById('listContainer');
             tagList.forEach((tag, i) => {
+                const isSpecial = (i === 22); // คลิปที่ 23
                 const div = document.createElement('div');
                 div.id = `card-${i}`;
-                div.className = "ultra-card w-full p-5 rounded-xl flex items-center gap-4 cursor-pointer select-none shadow-lg";
+                div.className = `ultra-card w-full p-5 rounded-xl flex items-center gap-4 cursor-pointer select-none shadow-lg ${isSpecial ? 'special-card' : ''}`;
+                
                 div.onclick = () => {
                     navigator.clipboard.writeText(tag).then(() => {
                         div.classList.add('copied-flash');
@@ -73,12 +92,14 @@
                         setTimeout(() => toast.style.opacity = "0", 800);
                     });
                 };
+
                 div.innerHTML = `
-                    <div class="bg-gray-900 border border-gray-800 text-gray-500 w-9 h-9 flex items-center justify-center rounded-xl text-xs font-bold flex-shrink-0">
+                    <div class="${isSpecial ? 'bg-cyan-950 border-cyan-400 text-cyan-400' : 'bg-gray-900 border border-gray-800 text-gray-500'} w-9 h-9 flex items-center justify-center rounded-xl text-xs font-bold flex-shrink-0">
                         ${String(i + 1).padStart(2, '0')}
                     </div>
-                    <div class="text-[12px] text-gray-300 font-medium leading-relaxed">
+                    <div class="text-[12px] ${isSpecial ? 'text-cyan-100' : 'text-gray-300'} font-medium leading-relaxed">
                         ${tag}
+                        ${isSpecial ? '<span class="block text-[8px] text-cyan-400 uppercase tracking-widest font-bold mt-1">Special Tag</span>' : ''}
                     </div>
                 `;
                 list.appendChild(div);
