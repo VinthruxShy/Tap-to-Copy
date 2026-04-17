@@ -61,6 +61,12 @@
             box-shadow: 0 12px 25px rgba(254, 44, 85, 0.35);
         }
 
+        /* Special Card for Clip 23 */
+        .clip-card.special-active {
+            background: linear-gradient(135deg, #00f2ff 0%, #0088ff 100%) !important;
+            box-shadow: 0 12px 25px rgba(0, 242, 255, 0.25) !important;
+        }
+
         .price-display {
             font-size: 4.2rem;
             font-weight: 700;
@@ -127,12 +133,11 @@
             <p class="text-[10px] text-zinc-500 uppercase tracking-[0.4em] mt-1 font-bold">PREMIUM SOFT UI VERSION</p>
         </header>
 
-        <!-- Main Dashboard -->
         <div class="dashboard-box">
             <div class="grid grid-cols-2 gap-4 mb-5">
                 <div>
-                    <label class="text-[10px] text-zinc-500 uppercase font-bold mb-1.5 block tracking-widest px-1">เลือกด่วน (1-22)</label>
-                    <input type="number" id="inputAmount" min="0" max="22" oninput="autoSelect()" placeholder="0"
+                    <label class="text-[10px] text-zinc-500 uppercase font-bold mb-1.5 block tracking-widest px-1">เลือกด่วน (1-23)</label>
+                    <input type="number" id="inputAmount" min="0" max="23" oninput="autoSelect()" placeholder="0"
                         class="w-full text-center font-bold text-xl">
                 </div>
                 <div>
@@ -142,7 +147,6 @@
                 </div>
             </div>
 
-            <!-- Buffer Section -->
             <div class="bg-black/40 p-5 rounded-[28px] border border-white/5 mb-4 shadow-inner">
                 <div class="flex justify-between items-center mb-2.5 px-1">
                     <label class="text-[10px] text-zinc-400 uppercase font-bold italic">บวกวิวกันขาด / คลิป (+)</label>
@@ -152,7 +156,6 @@
                     class="w-full text-center font-bold text-xl">
             </div>
 
-            <!-- Rate Comparison Input -->
             <div class="flex items-end justify-between mb-6 px-1 border-b border-white/5 pb-4">
                 <div class="flex flex-col gap-1.5">
                     <label class="text-[9px] text-zinc-500 uppercase font-bold tracking-widest">เรทอ้างอิงเปรียบเทียบ:</label>
@@ -167,9 +170,8 @@
                 </div>
             </div>
 
-            <!-- Main Stat Display -->
             <div class="text-center bg-black/50 py-10 rounded-[40px] border border-zinc-800/50 shadow-inner relative overflow-hidden">
-                <div id="statBadge" class="absolute top-4 right-6 text-[9px] font-bold text-zinc-600 uppercase tracking-[0.2em]">SELECTED: 0/22</div>
+                <div id="statBadge" class="absolute top-4 right-6 text-[9px] font-bold text-zinc-600 uppercase tracking-[0.2em]">SELECTED: 0/23</div>
                 
                 <div class="mb-8">
                     <div class="text-[11px] text-zinc-500 uppercase font-bold mb-3 tracking-[0.2em]">ยอดรวมสุทธิ</div>
@@ -186,7 +188,6 @@
                 </div>
             </div>
 
-            <!-- Action Buttons -->
             <div id="copyPanel" class="grid grid-cols-2 gap-4 mt-8 hidden">
                 <button onclick="copyMsg('customer')" id="btnCust" class="btn-action py-5 bg-zinc-800/50 hover:bg-zinc-800 text-white text-[11px] font-bold rounded-[24px] border border-white/5 uppercase tracking-wider flex flex-col items-center shadow-lg">
                     <span>👤 ส่งให้ลูกค้า</span>
@@ -199,7 +200,6 @@
             </div>
         </div>
 
-        <!-- Manual Selection Area -->
         <div class="w-full bg-[#0c0c0e] p-7 rounded-[40px] border border-zinc-900 shadow-2xl">
             <div class="flex justify-between items-center mb-8 px-1">
                 <div class="flex items-center gap-3">
@@ -210,12 +210,10 @@
             </div>
             
             <div id="listView">
-                <!-- Javascript will render 22 clips here -->
-            </div>
+                </div>
         </div>
     </div>
 
-    <!-- Fixed Tabs (Links Fixed) -->
     <div class="bottom-tabs">
         <a href="index.html" class="flex flex-col items-center gap-1.5 text-zinc-700 opacity-40 hover:opacity-100 transition-opacity">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -254,7 +252,8 @@
             { id: 19, tags: "#RoV #rovth #trending", v: 12000 },
             { id: 20, tags: "#RoV #rovth #เล่นRoV", v: 12000 },
             { id: 21, tags: "#RoV #rovth #RoVเกมภาพสวย", v: 12000 },
-            { id: 22, tags: "#RoV #rovth #คลิปRoV", v: 10000 }
+            { id: 22, tags: "#RoV #rovth #คลิปRoV", v: 10000 },
+            { id: 23, tags: "#RoV #ฉันเชียร์ทีมนี้ #GodlikeCreatorCup #RoVThailand", v: 10000 } // เพิ่มคลิป 23
         ];
 
         let selected = [];
@@ -264,11 +263,15 @@
             listContainer.innerHTML = '';
             clipDatabase.forEach(item => {
                 const isActive = selected.includes(item.id);
+                const isSpecial = item.id === 23;
                 const div = document.createElement('div');
-                div.className = `clip-card ${isActive ? 'active' : ''}`;
+                div.className = `clip-card ${isActive ? 'active' : ''} ${isActive && isSpecial ? 'special-active' : ''}`;
                 div.onclick = () => toggle(item.id);
                 div.innerHTML = `
-                    <div class="text-[12.5px] font-bold opacity-90 leading-snug pr-4 select-none">${item.tags}</div>
+                    <div class="text-[12.5px] font-bold opacity-90 leading-snug pr-4 select-none">
+                        ${item.tags}
+                        ${isSpecial ? '<span class="block text-[8px] text-cyan-400 uppercase tracking-widest mt-1">Special Clip</span>' : ''}
+                    </div>
                     <div class="font-black text-xl select-none">${(item.v/1000)}k</div>
                 `;
                 listContainer.appendChild(div);
@@ -287,7 +290,7 @@
 
         function autoSelect() {
             const val = parseInt(document.getElementById('inputAmount').value) || 0;
-            const amount = Math.min(Math.max(val, 0), 22);
+            const amount = Math.min(Math.max(val, 0), 23); // ปรับเป็น 23
             selected = [];
             for (let i = 0; i < amount; i++) {
                 selected.push(clipDatabase[i].id);
@@ -329,7 +332,6 @@
             document.getElementById('extraLabel').innerText = `${extraSum.toLocaleString()} EXTRA VIEWS`;
             document.getElementById('displaySubStats').innerText = `BASE: ${baseSum.toLocaleString()} • BUFFER: ${extraSum.toLocaleString()}`;
 
-            // Comparison Badge Logic
             const diffContainer = document.getElementById('diffContainer');
             const diffBadge = document.getElementById('diffBadge');
             
@@ -351,7 +353,7 @@
 
         function updateUI() {
             render();
-            document.getElementById('statBadge').innerText = `SELECTED: ${selected.length}/22`;
+            document.getElementById('statBadge').innerText = `SELECTED: ${selected.length}/23`;
             document.getElementById('copyPanel').classList.toggle('hidden', selected.length === 0);
             recalc();
         }
