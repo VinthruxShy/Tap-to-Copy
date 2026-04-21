@@ -12,10 +12,9 @@
         .mission-item { background: #111; border: 1px solid #222; transition: 0.2s; padding: 10px 14px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
         .mission-item.active { border-color: #FE2C55; background: rgba(254, 44, 85, 0.1); }
         .clip-btn { transition: all 0.2s; border: 1px solid #222; position: relative; }
-        .clip-btn.selected { background: #FE2C55; border-color: #FE2C55; color: white; box-shadow: 0 0 15px rgba(254, 44, 85, 0.4); }
+        .clip-btn.selected { background: #FE2C55 !important; border-color: #FE2C55; color: white; box-shadow: 0 0 15px rgba(254, 44, 85, 0.4); }
         .vip-badge { position: absolute; top: -6px; right: -6px; background: #FFD700; color: #000; font-size: 7px; padding: 1px 4px; border-radius: 4px; font-weight: bold; }
         .special-badge { position: absolute; top: -6px; right: -6px; background: #00f2ff; color: #000; font-size: 7px; padding: 1px 4px; border-radius: 4px; font-weight: bold; }
-        /* Nav Styling */
         .nav-active { color: #FE2C55 !important; border-top: 2px solid #FE2C55; }
         nav { background: rgba(10, 10, 10, 0.98); border-top: 1px solid rgba(255, 255, 255, 0.1); }
     </style>
@@ -47,15 +46,12 @@
 
             <div id="exchangeSummary" class="mt-4 pt-4 border-t border-gray-800 text-left space-y-3 hidden">
                 <div id="exchangeList" class="text-sm text-white font-bold mb-1"></div>
-                
                 <button onclick="copyBaseOnly(event)" class="w-full bg-sky-500/20 hover:bg-sky-500/30 text-sky-400 text-[10px] font-bold py-3 rounded-xl border border-sky-500/30 transition-all">
-                    <span id="copyBaseText">คัดลอกแผนงาน (คลิป + รายเดือน)</span>
+                    <span id="copyBaseText">คัดลอกแผนงาน</span>
                 </button>
-
                 <button onclick="copyUpdateOnly(event)" class="w-full bg-[#FE2C55] hover:bg-[#FE2C55]/80 text-white text-[10px] font-bold py-3 rounded-xl transition-all">
                     <span id="copyUpdateText">คัดลอกรางวัลที่ต้องรอรับ</span>
                 </button>
-
                 <div class="flex justify-between items-center bg-black/50 p-3 rounded-xl mt-2 text-[10px]">
                     <div>ต้องใช้: <span id="usedPts" class="text-sky-400 font-bold">0</span></div>
                     <div id="remainLabel">ขาด/เหลือ: <span id="remainPts" class="font-bold">0</span></div>
@@ -65,7 +61,7 @@
 
         <div class="glass-card p-5">
             <div class="flex justify-between items-center mb-3 text-xs font-bold uppercase tracking-widest">
-                <span>🎬 จำนวนคลิป (<span id="clipCount" class="text-[#FE2C55]">0</span>/23)</span>
+                <span>🎬 จำนวนคลิป (<span id="clipCount" class="text-[#FE2C55]">0</span>/24)</span>
                 <span class="text-[9px] text-gray-500">ย่อย: <span id="subCount" class="text-white">0</span>/30</span>
             </div>
             <div class="grid grid-cols-5 gap-3" id="clipGrid"></div>
@@ -98,13 +94,12 @@
     </nav>
 
     <script>
-        // Data & Logic (คงเดิมตามที่คุณต้องการ)
         const clipData = [
             {v:6, vip:false}, {v:6, vip:false}, {v:8, vip:true}, {v:8, vip:true}, {v:8, vip:true},
             {v:8, vip:true}, {v:8, vip:true}, {v:10, vip:true}, {v:10, vip:true}, {v:10, vip:true},
             {v:8, vip:true}, {v:8, vip:true}, {v:8, vip:true}, {v:10, vip:true}, {v:10, vip:true},
             {v:10, vip:true}, {v:10, vip:true}, {v:12, vip:true}, {v:12, vip:true}, {v:12, vip:true},
-            {v:12, vip:true}, {v:10, vip:true}, {v:10, vip:false, special:true}
+            {v:12, vip:true}, {v:10, vip:true}, {v:10, vip:false, special:true}, {v:10, vip:false, special:true}
         ];
 
         const monthlyM = [
@@ -127,19 +122,20 @@
 
         function getBasePoints() {
             let pts = 0;
-            if (selClips.size > 0) {
-                selClips.forEach(idx => {
-                    if (idx === 0) pts += 20;
-                    else if (idx === 22) pts += 50;
-                    else pts += 25;
-                });
-            }
+            selClips.forEach(idx => {
+                if (idx === 0) pts += 20;
+                // ให้ 50 แต้มเฉพาะเมื่อคลิปนั้นเป็นพิเศษ และไม่ใช่คลิปที่ 1 หรือ 2 (index 0, 1)
+                else if (clipData[idx].special) pts += 50;
+                else pts += 25;
+            });
             selMissions.forEach(id => {
                 const m = monthlyM.find(x => x.id === id);
                 if(m) pts += m.pts;
             });
             return pts;
         }
+
+        // ... (คงฟังก์ชัน getUpdatePoints, updatePoints, copyBaseOnly, copyUpdateOnly, calculateExchange ไว้เหมือนเดิม) ...
 
         function getUpdatePoints() {
             let pts = 0;
@@ -163,15 +159,10 @@
 
         function copyBaseOnly(event) {
             const pts = getBasePoints();
-            let mText = "";
-            selMissions.forEach(id => {
-                const m = monthlyM.find(x => x.id === id);
-                if(m) mText += `• ${m.name}\n`;
-            });
-            const text = `📊 แผนงานลงคลิป (ไม่รวม 12 ชม.)\nเป้าหมาย: ${currentGoal} คูปอง\nคลิปที่ลง: ${selClips.size} คลิป\nแต้มพื้นฐาน: ${pts} แต้ม\n\n✅ รายการภารกิจที่ต้องรับ:\n${mText || 'ไม่มี'}`;
+            const text = `📊 แผนงานลงคลิป\nคลิปที่ลง: ${selClips.size} คลิป\nแต้มพื้นฐาน: ${pts} แต้ม`;
             navigator.clipboard.writeText(text).then(() => {
                 document.getElementById('copyBaseText').innerText = "คัดลอกแล้ว! ✅";
-                setTimeout(() => document.getElementById('copyBaseText').innerText = "คัดลอกแผนงาน (คลิป + รายเดือน)", 2000);
+                setTimeout(() => document.getElementById('copyBaseText').innerText = "คัดลอกแผนงาน", 2000);
             });
         }
 
@@ -181,7 +172,7 @@
                 const u = updateM.find(x => x.id === id);
                 if(u) uText += `• ${u.name}\n`;
             });
-            const text = `🕒 รางวัลที่ต้องรอรับ (อัปเดต 12 ชม.)\nเป้าหมาย: ${currentGoal} คูปอง\n\n✅ รายการที่ต้องรอรับ:\n${uText || 'ไม่มี'}\n*ตรวจสอบเวลา: หกโมงเช้า, หกโมงเย็น หรือเที่ยงคืน*`;
+            const text = `🕒 รางวัลที่ต้องรอรับ (อัปเดต 12 ชม.)\nเป้าหมาย: ${currentGoal} คูปอง\n\n✅ รายการที่ต้องรอรับ:\n${uText || 'ไม่มี'}`;
             navigator.clipboard.writeText(text).then(() => {
                 document.getElementById('copyUpdateText').innerText = "คัดลอกแล้ว! ✅";
                 setTimeout(() => document.getElementById('copyUpdateText').innerText = "คัดลอกรางวัลที่ต้องรอรับ", 2000);
@@ -189,7 +180,6 @@
         }
 
         function calculateExchange(pts) {
-            const rewards = [{p:500,c:300,l:2}, {p:300,c:180,l:3}, {p:100,c:70,l:4}];
             let best = null;
             for (let c1 = 0; c1 <= 2; c1++) for (let c2 = 0; c2 <= 3; c2++) for (let c3 = 0; c3 <= 4; c3++) {
                 if ((c1*500)+(c2*300)+(c3*100) === currentGoal) {
@@ -224,22 +214,22 @@
                 }
             }
             if(targetCost === 0) return;
-            selMissions.add('tiktok'); selMissions.add('first'); 
-            for(let i=0; i < 12; i++) {
+            selMissions.add('tiktok'); selMissions.add('first');
+            
+            // ลำดับการเลือก: 1. เลือกคลิปปกติก่อนจนครบ 2 คลิป 2. ค่อยเริ่มเลือกคลิปพิเศษ
+            const normalClips = [];
+            const specialClips = [];
+            clipData.forEach((c, i) => c.special ? specialClips.push(i) : normalClips.push(i));
+            
+            // จัดเรียง: เอาคลิปปกติ 2 อันแรกขึ้นก่อน เพื่อให้ครบ 3 คลิปถึงจะเริ่มใช้ special
+            const priorityOrder = [...normalClips.slice(0, 2), ...specialClips, ...normalClips.slice(2)];
+
+            for(let i of priorityOrder) {
                 if (getBasePoints() + getUpdatePoints() >= targetCost) break;
                 selClips.add(i);
                 selMissions.add('m500'); selMissions.add('m5k'); selMissions.add('l100');
                 updateMissionsByCount();
                 updatePoints();
-            }
-            let currentPts = getBasePoints() + getUpdatePoints();
-            if (selClips.size >= 12 && currentPts < targetCost) {
-                let diff = targetCost - currentPts;
-                if (diff > 25) { selClips.add(22); updatePoints(); }
-            }
-            for(let i=12; i < 22; i++) {
-                if (getBasePoints() + getUpdatePoints() >= targetCost) break;
-                if (!selClips.has(i)) { selClips.add(i); updateMissionsByCount(); updatePoints(); }
             }
             document.getElementById('aiAdvice').innerHTML = `AI แนะนำทำ <span class="text-white">${selClips.size} คลิป</span>`;
             render();
@@ -247,17 +237,13 @@
 
         function updateMissionsByCount() {
             const count = selClips.size;
-            if (count > 0) {
-                if(count >= 2) selMissions.add('c2');
-                if(count >= 5) selMissions.add('c5');
-                if(count >= 10) selMissions.add('c10');
-                if(count >= 15) selMissions.add('c15');
-                const vC = Array.from(selClips).filter(idx => clipData[idx].vip).length;
-                if(vC >= 1) selMissions.add('vip1'); if(vC >= 3) selMissions.add('vip3'); if(vC >= 7) selMissions.add('vip7'); if(vC >= 12) selMissions.add('vip12');
-                selClips.forEach(idx => { if(clipData[idx].v >= 10) selMissions.add('v10k'); });
-                let totalV = Array.from(selClips).reduce((s, idx) => s + clipData[idx].v, 0);
-                if(totalV >= 30) selMissions.add('m30k');
-            }
+            if(count >= 2) selMissions.add('c2'); if(count >= 5) selMissions.add('c5');
+            if(count >= 10) selMissions.add('c10'); if(count >= 15) selMissions.add('c15');
+            const vC = Array.from(selClips).filter(idx => clipData[idx].vip).length;
+            if(vC >= 1) selMissions.add('vip1'); if(vC >= 3) selMissions.add('vip3'); if(vC >= 7) selMissions.add('vip7'); if(vC >= 12) selMissions.add('vip12');
+            selClips.forEach(idx => { if(clipData[idx].v >= 10) selMissions.add('v10k'); });
+            let totalV = Array.from(selClips).reduce((s, idx) => s + clipData[idx].v, 0);
+            if(totalV >= 30) selMissions.add('m30k');
         }
 
         function render() {
