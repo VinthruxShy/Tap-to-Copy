@@ -47,6 +47,18 @@
     </nav>
 
     <script>
+    
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+   
+        document.onkeydown = function(e) {
+            if (e.keyCode == 123) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+        }
+
         const tagData = [
             { tag: "#RoV #RoVเป็นเกมตลก #คลิปRoV", view: "6,000" },
             { tag: "#RoV #คลิปRoV #rovth", view: "6,000" },
@@ -81,7 +93,6 @@
                 const div = document.createElement('div');
                 div.className = `ultra-card w-full p-5 rounded-xl flex items-center gap-4 cursor-pointer select-none shadow-lg ${isSpecial ? 'special-card' : ''}`;
                 
-                // คัดลอกทั้งแท็กและยอดวิว
                 div.onclick = () => {
                     const textToCopy = `${item.tag} (View: ${item.view})`;
                     navigator.clipboard.writeText(textToCopy).then(() => {
