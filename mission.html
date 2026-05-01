@@ -27,13 +27,13 @@
             <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1">Tag-Based Planning 2026</p>
         </header>
 
-        <!-- โซนกรอกเป้าหมาย -->
+        <!-- โซนกรอกเป้าหมาย (ปรับปรุง Layout สำหรับมือถือ) -->
         <div class="glass-card p-5 border-[#FE2C55]/20 border">
             <h3 class="text-[10px] text-gray-500 uppercase font-bold mb-3 tracking-widest text-center">ระบุเป้าหมายคูปอง</h3>
             
-            <div class="flex gap-2 mb-4">
-                <input type="number" id="customInput" placeholder="จำนวนคูปอง" class="flex-grow bg-black border border-gray-800 p-4 rounded-2xl text-2xl font-bold text-center text-white outline-none focus:border-[#FE2C55]">
-                <button onclick="runUltraAI()" class="bg-[#FE2C55] text-white px-6 rounded-2xl font-bold text-sm active:scale-95">คำนวณ</button>
+            <div class="space-y-3 mb-4">
+                <input type="number" id="customInput" placeholder="จำนวนคูปอง" class="w-full bg-black border border-gray-800 p-4 rounded-2xl text-2xl font-bold text-center text-white outline-none focus:border-[#FE2C55]">
+                <button onclick="runUltraAI()" class="w-full bg-[#FE2C55] text-white py-4 rounded-2xl font-bold text-lg active:scale-95 shadow-lg shadow-[#FE2C55]/20">คำนวณคูปอง</button>
             </div>
 
             <div class="flex flex-wrap justify-center gap-2 mb-4">
