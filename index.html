@@ -21,7 +21,7 @@
     <div class="w-full max-w-md space-y-4 mb-28">
         <header class="text-center py-6 border-b border-gray-900 mb-4">
             <h1 class="text-2xl font-bold tracking-tighter text-white uppercase italic">RoV <span class="text-[#FE2C55]">Tag</span> Deck</h1>
-            <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Tap card to copy tags with views</p>
+            <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Tap card to copy tags with clip numbers</p>
         </header>
 
         <div id="listContainer" class="grid grid-cols-1"></div>
@@ -76,11 +76,14 @@
         function render() {
             const list = document.getElementById('listContainer');
             tagData.forEach((item, i) => {
+                const clipNum = String(i + 1).padStart(2, '0');
                 const div = document.createElement('div');
                 div.className = `ultra-card w-full p-5 rounded-xl flex items-center gap-4 cursor-pointer select-none shadow-lg`;
                 
                 div.onclick = () => {
-                    const textToCopy = `${item.tag} (View ${item.view})`;
+                    // แก้ไขตรงนี้เพื่อรวมลำดับคลิปเข้าไปในข้อความที่คัดลอก
+                    const textToCopy = `คลิปที่ ${clipNum}: ${item.tag} (View ${item.view})`;
+                    
                     navigator.clipboard.writeText(textToCopy).then(() => {
                         div.classList.add('copied-flash');
                         setTimeout(() => div.classList.remove('copied-flash'), 400);
@@ -92,7 +95,7 @@
 
                 div.innerHTML = `
                     <div class="bg-gray-900 border border-gray-800 text-gray-500 w-9 h-9 flex items-center justify-center rounded-xl text-[10px] font-bold flex-shrink-0">
-                        ${String(i + 1).padStart(2, '0')}
+                        ${clipNum}
                     </div>
                     <div class="flex-grow">
                         <div class="text-[12px] text-gray-300 font-medium leading-relaxed">
